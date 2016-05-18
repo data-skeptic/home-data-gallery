@@ -22,9 +22,9 @@
           <option value='1'>1</option>
           <option value='2'>2</option>
           <option value='3'>3</option>
-          <option value='4'>3</option>
-          <option value='5'>3</option>
-          <option value='6' selected>4</option>
+          <option value='4'>4</option>
+          <option value='5'>5</option>
+          <option value='6' selected>6</option>
         <select>
         Baths:
         <select id='min_baths'>
@@ -285,9 +285,13 @@
 	      .style("opacity", 0.5); // opacity of circle
   }
   
+  function showWaiting() {
+  	$(".plotCell").html("<img src='box.gif' />")
+  }
+  
   $('#btnReload').click(function() { render() } );
   $( document ).ready(function() {
-  	$(".plotCell").html("<img src='box.gif' />")
+  	showWaiting()
   	render()
   });
   </script>
