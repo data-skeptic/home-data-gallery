@@ -1,0 +1,313 @@
+<html lang="en">
+  <head>
+    <title>OpenHouse data visualization</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+  </head>
+  <body>
+    <div id='outer'>
+      <div id='header'>
+        <img src='http://dataskeptic.com/home-sales/dshs.png' id='logo' />
+        Beds:
+        <select id='min_beds'>
+          <option value='1'>1</option>
+          <option value='2'>2</option>
+          <option value='3'>3</option>
+          <option value='4'>4</option>
+          <option value='5'>4</option>
+          <option value='6'>4</option>
+        <select>
+        -
+        <select id='max_beds'>
+          <option value='1'>1</option>
+          <option value='2'>2</option>
+          <option value='3'>3</option>
+          <option value='4'>4</option>
+          <option value='5'>5</option>
+          <option value='6' selected>6</option>
+        <select>
+        Baths:
+        <select id='min_baths'>
+          <option value='1'>1</option>
+          <option value='2'>2</option>
+          <option value='3'>3</option>
+          <option value='4'>4</option>
+          <option value='5'>4</option>
+          <option value='6'>4</option>
+        <select>
+        -
+        <select id='max_baths'>
+          <option value='1'>1</option>
+          <option value='2'>2</option>
+          <option value='3'>3</option>
+          <option value='4'>3</option>
+          <option value='5'>3</option>
+          <option value='6' selected>4</option>
+        <select>
+        Sqft:
+        <input id='min_sqft' value='0' />
+        -
+        <input id='max_sqft' value='10000' />
+        <button id='btnReload'>Reload</button>
+      </div>
+      <div id='center'>
+        <table>
+          <tr>
+            <td></td>
+            <td>Price</td>
+            <td>Beds</td>
+            <td>Baths</td>
+            <td>Sqft</td>
+          </tr>
+          <tr>
+            <td>Price</td>
+            <td class='plotCell' id='PriceVPrice'></td>
+            <td class='plotCell' id='PriceVBeds'></td>
+            <td class='plotCell' id='PriceVBaths'></td>
+            <td class='plotCell' id='PriceVSqft'></td>
+          </tr>
+          <tr>
+            <td>Beds</td>
+            <td></td>
+            <td class='plotCell' id='BedsVBeds'></td>
+            <td class='plotCell' id='BedsVBaths'></td>
+            <td class='plotCell' id='BedsVSqft'></td>
+          </tr>
+          <tr>
+            <td>Baths</td>
+            <td></td>
+            <td></td>
+            <td class='plotCell' id='BathsVBaths'></td>
+            <td class='plotCell' id='BathsVSqft'></td>
+          </tr>
+          <tr>
+            <td>Sqft</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class='plotCell' id='SqftVSqft'></td>
+          </tr>
+        </table>
+      </div>
+      <div id='footer'>
+      </div>
+    </div>
+  </body>
+  <script>
+  var baseurl = "https://home-sales-data-api.herokuapp.com"
+
+  function render() {
+  	var min_price = 0
+  	var max_price = 1000000000
+  	var min_beds = $('#min_beds').val()
+  	var max_beds = $('#max_beds').val()
+  	var min_baths = $('#min_baths').val()
+  	var max_baths = $('#max_baths').val()
+  	var min_sqft = $('#min_sqft').val()
+  	var max_sqft = $('#max_sqft').val()
+
+  	request = {'min_price': min_price,
+        'max_price': max_price,
+        'min_bedrooms': min_beds,
+        'max_bedrooms': max_beds,
+        'min_bathrooms': min_baths,
+        'max_bathrooms': max_baths,
+        'min_building_size': min_sqft,
+        'max_building_size': max_sqft,
+        'limit': '500',
+        'offset': '0'
+    }
+
+    var murl = baseurl + '/api/property/?'
+    var keys = Object.keys(request)
+    for (var i in keys) {
+    	var item = keys[i]
+    	if (i > 0) {
+    		murl += "&"
+    	}
+    	murl += item + "=" + request[item]
+    }
+    console.log(murl)
+    $.ajax({
+    	url: murl,
+    	type: 'GET',
+    	contentType: 'text/json',
+    	dataType: 'json',
+    	success: function(resp) {
+    		makePlots(resp)
+    	},
+    	error: function() {
+    		console.log('error')
+    	}
+    })
+  }
+
+  function makePlots(data) {
+  	var dims = ['price', 'bathrooms', 'bedrooms', 'building_size']
+    var cells = ['Price', 'Beds', 'Baths', 'Sqft']
+    var w = 200
+    var h = 200
+  	for (var r=0; r < dims.length; r++) {
+  		for (var c=r; c < dims.length; c++) {
+  			var container = cells[r] + 'V' + cells[c]
+  			xy = extractData(data, dims[r], dims[c])
+  			if (r==c) {
+  				histogram(container, xy['x'], w, h)
+  			} else {
+	  			scatterplot(container, xy, w, h)
+	  		}
+  		}
+  	}
+  }
+  
+  function extractData(data, var1, var2) {
+  	var pdata = {x: [], y: []}
+  	for (var d in data) {
+  		var property = data[d]
+  		x = property[var1]
+  		y = property[var2]
+  		pdata['x'].push(x)
+  		pdata['y'].push(y)
+  	}
+  	return pdata
+  }
+
+  function histogram(container, series, w, h) {
+	var values = series
+
+	// A formatter for counts.
+	var formatCount = d3.format(",.0f");
+
+	var margin = {top: 20, right: 15, bottom: 60, left: 60}
+	    width = w - margin.left - margin.right,
+	    height = h - margin.top - margin.bottom;
+
+	var x = d3.scale.linear()
+	    .domain([0, Math.max(...values)])
+	    .range([0, width]);
+
+	var data = d3.layout.histogram()
+	    .bins(x.ticks(20))
+	    (values);
+
+	var y = d3.scale.linear()
+	    .domain([0, d3.max(data, function(d) { return d.y; })])
+	    .range([height, 0]);
+
+	var xAxis = d3.svg.axis()
+	    .scale(x)
+	    .orient("bottom");
+
+	$("#" + container).html('')
+	var svg = d3.select("#" + container).append("svg")
+	    .attr("width", width + margin.left + margin.right)
+	    .attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	var bar = svg.selectAll(".bar")
+	    .data(data)
+	  .enter().append("g")
+	    .attr("class", "bar")
+	    .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+
+	bar.append("rect")
+	    .attr("x", 1)
+	    .attr("width", x(data[0].dx) - 1)
+	    .attr("height", function(d) { return height - y(d.y); });
+
+	svg.append("g")
+	    .attr("class", "x axis")
+	    .attr("transform", "translate(0," + height + ")")
+	    .call(xAxis);
+  }
+
+  function scatterplot(container, xy, w, h) {
+	var xdata = xy['x']
+	var ydata = xy['y']
+
+	// size and margins for the chart
+	var margin = {top: 20, right: 15, bottom: 60, left: 60}
+	  , width = w - margin.left - margin.right
+	  , height = h - margin.top - margin.bottom;
+
+	var x = d3.scale.linear()
+	          .domain([0, d3.max(xdata)])
+	          .range([ 0, width ])
+
+	var y = d3.scale.linear()
+	          .domain([0, d3.max(ydata)])
+	          .range([ height, 0 ])
+
+	$('#' + container).html('')
+	var chart = d3.select('#' + container)
+	.append('svg:svg')
+	.attr('width', width + margin.right + margin.left)
+	.attr('height', height + margin.top + margin.bottom)
+	.attr('class', 'chart')
+
+	// the main object where the chart and axis will be drawn
+	var main = chart.append('g')
+	.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+	.attr('width', width)
+	.attr('height', height)
+	.attr('class', 'main')   
+
+	// draw the x axis
+	var xAxis = d3.svg.axis()
+	.scale(x)
+	.orient('bottom');
+
+	main.append('g')
+	.attr('transform', 'translate(0,' + height + ')')
+	.attr('class', 'main axis date')
+	.call(xAxis);
+
+	// draw the y axis
+	var yAxis = d3.svg.axis()
+	.scale(y)
+	.orient('left');
+
+	main.append('g')
+	.attr('transform', 'translate(0,0)')
+	.attr('class', 'main axis date')
+	.call(yAxis);
+
+	// draw the graph object
+	var g = main.append("svg:g"); 
+
+	g.selectAll("scatter-dots")
+	  .data(ydata)  // using the values in the ydata array
+	  .enter().append("svg:circle")  // create a new circle for each value
+	      .attr("cy", function (d) { return y(d); } ) // translate y value to a pixel
+	      .attr("cx", function (d,i) { return x(xdata[i]); } ) // translate x value
+	      .attr("r", 2) // radius of circle
+	      .style("opacity", 0.5); // opacity of circle
+  }
+  
+  function showWaiting() {
+  	$(".plotCell").html("<img src='box.gif' />")
+  }
+  
+  $('#btnReload').click(function() { render() } );
+  $( document ).ready(function() {
+  	showWaiting()
+  	render()
+  });
+  </script>
+  <style>
+    body {
+    	margin: 0px;
+    }
+    #logo {
+      height:100px;
+    }
+    #header {
+      background-color: #eee;
+    }
+    .plotCell {
+    	width: 200px;
+    	height: 200px;
+    }
+  </style>
+</html>
