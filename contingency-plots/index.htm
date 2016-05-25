@@ -14,8 +14,8 @@
           <option value='2'>2</option>
           <option value='3'>3</option>
           <option value='4'>4</option>
-          <option value='5'>4</option>
-          <option value='6'>4</option>
+          <option value='5'>5</option>
+          <option value='6'>6</option>
         <select>
         -
         <select id='max_beds'>
@@ -32,32 +32,31 @@
           <option value='2'>2</option>
           <option value='3'>3</option>
           <option value='4'>4</option>
-          <option value='5'>4</option>
-          <option value='6'>4</option>
+          <option value='5'>5</option>
+          <option value='6'>6</option>
         <select>
         -
         <select id='max_baths'>
           <option value='1'>1</option>
           <option value='2'>2</option>
           <option value='3'>3</option>
-          <option value='4'>3</option>
-          <option value='5'>3</option>
-          <option value='6' selected>4</option>
+          <option value='4'>4</option>
+          <option value='5'>5</option>
+          <option value='6' selected>6</option>
         <select>
         Sqft:
         <input id='min_sqft' value='0' />
         -
         <input id='max_sqft' value='10000' />
-        <button id='btnReload'>Reload</button>
       </div>
       <div id='center'>
         <table>
           <tr>
             <td></td>
-            <td>Price</td>
-            <td>Beds</td>
-            <td>Baths</td>
-            <td>Sqft</td>
+            <td class="headerRow">Price</td>
+            <td class="headerRow">Beds</td>
+            <td class="headerRow">Baths</td>
+            <td class="headerRow">Sqft</td>
           </tr>
           <tr>
             <td>Price</td>
@@ -289,8 +288,18 @@
   	$(".plotCell").html("<img src='box.gif' />")
   }
   
-  $('#btnReload').click(function() { render() } );
+  onchange = function() {
+    showWaiting()
+    render()
+  }
+
   $( document ).ready(function() {
+    $("#min_beds").change(onchange)
+    $("#max_beds").change(onchange)
+    $("#min_baths").change(onchange)
+    $("#max_baths").change(onchange)
+    $("#min_sqft").change(onchange)
+    $("#max_sqft").change(onchange)
   	showWaiting()
   	render()
   });
@@ -309,5 +318,9 @@
     	width: 200px;
     	height: 200px;
     }
+    .headerRow {
+      text-align: center;
+    }
   </style>
 </html>
+
