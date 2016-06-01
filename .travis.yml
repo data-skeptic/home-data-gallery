@@ -1,8 +1,9 @@
-language: node_js
-node_js:
-    - "5"
+language: python
+python:
+    - 3.5
 script:
-    - "echo done"
+    - "pip install jupyter nbconvert"
+    - "jupyter nbconvert --to HTML ./**.ipynb"
 deploy:
     - provider: s3
       access_key_id: $S3_ID
