@@ -1,0 +1,66 @@
+body {
+	margin: 0px;
+}
+#logo {
+  height:100px;
+}
+#header {
+  background-color: #eee;
+}
+.plotCell {
+	width: 200px;
+	height: 200px;
+}
+.headerRow {
+  text-align: center;
+}
+#curl {
+    width: 700px;
+}
+#btnCopy {
+    margin: 0px;
+    width: 35px;
+    height: 25px;
+}
+#copyPng {
+    height: 20px;
+}
+#errorBox {
+    background-color: #fbb;
+    padding: 10px;
+    margin: 10px;
+    border-color: #444;
+    border-width: 1px;
+    border-style: outset;
+    display: none;
+}
+#curlBox {
+    margin: 10px;
+}
+.valLabel {
+    color: #ff4411;
+    font-size: 28px;
+    font-family: 'Signika', sans-serif;
+    padding-bottom: 10px;
+}
+#logo {
+  float: left;
+  width: 100px;
+  overflow: hidden;
+}
+#header {
+    height: 100px;
+}
+#selectors {
+    padding: 10px;
+    margin: auto;
+    line-height: 35px;
+}
+#address {
+    width: 400px;
+}
+.sqft {
+    width: 50px;
+}
+#mapid { height: 180px; }
+
