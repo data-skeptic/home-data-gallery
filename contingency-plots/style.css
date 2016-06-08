@@ -1,30 +1,60 @@
 body {
 	margin: 0px;
 }
-#logo {
-  height:100px;
+
+select {
+	font-family: 'Signika', sans-serif;
+	font-size: 1em;
+	border-style: solid 1px;
 }
+
+input {
+	font-family: 'Signika', sans-serif;
+	font-size: 1em;
+}
+
+#logo {
+  float: left;
+  height:100px;
+  width: 100px;
+  overflow: hidden;
+}
+
 #header {
   background-color: #eee;
+  height: 100px;
 }
+
+.headerRow {
+  text-align: center;
+}
+
 .plotCell {
 	width: 200px;
 	height: 200px;
 }
-.headerRow {
-  text-align: center;
-}
+
 #curl {
     width: 700px;
 }
+
+#curlBox {
+	padding: 25px;
+    background-color: #eee;
+    font-family: 'Signika', sans-serif;
+	font-size: 1em;
+}
+
 #btnCopy {
     margin: 0px;
     width: 35px;
     height: 25px;
 }
+
 #copyPng {
     height: 20px;
 }
+
 #errorBox {
     background-color: #fbb;
     padding: 10px;
@@ -34,33 +64,32 @@ body {
     border-style: outset;
     display: none;
 }
-#curlBox {
-    margin: 10px;
-}
+
 .valLabel {
     color: #ff4411;
-    font-size: 28px;
+    font-size: 24px;
     font-family: 'Signika', sans-serif;
     padding-bottom: 10px;
 }
-#logo {
-  float: left;
-  width: 100px;
-  overflow: hidden;
-}
-#header {
-    height: 100px;
-}
+
 #selectors {
-    padding: 10px;
-    margin: auto;
+	font-family: 'Signika', sans-serif;
+	font-size: 1em;
+	float: left;
+	padding-top: 20px;
+	padding-left: 20px;
     line-height: 35px;
 }
+
 #address {
     width: 400px;
 }
+
 .sqft {
-    width: 50px;
+    width: 60px;
 }
-#mapid { height: 180px; }
+
+#mapid { 
+	height: 180px; 
+}
 
