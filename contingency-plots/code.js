@@ -38,8 +38,9 @@ function render() {
   	contentType: 'text/json',
   	dataType: 'json',
   	success: function(resp) {
-  		makePlots(resp)
-      var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+      makePlots(resp)
+      updateMap(resp)
+      updateTable(resp)
   	},
   	error: function() {
   		console.log('error')
@@ -73,6 +74,42 @@ function makePlots(resp) {
   }
 }
 
+function updateMap(resp) {
+  console.log(resp)
+  if (resp['count'] > 0) {
+    data = resp['results']
+    console.log(data)
+    //var center = [39.8282, -98.5795];
+    //L.marker(center).addTo(map);  
+  }
+  else {
+    console.log("No listings to update")
+  }
+}
+
+function updateTable(resp) {
+  $("#myTable tr").remove(); 
+  if (resp['count'] > 0) {
+    data = resp['results']
+    $.each(data, function(i, elem) {
+      var rows = "<tr>"
+      rows += "<td>" + elem['geocoded_address'] + "</td>"
+      rows += "<td>" + elem['bedrooms'] + "</td>"
+      rows += "<td>" + elem['bathrooms'] + "</td>"
+      rows += "<td>" + elem['building_size'] + "</td>"
+      rows += "<td>" + elem['var_spaces'] + "</td>"
+      rows += "<td>" + elem['listing_type'] + "</td>"
+      rows += "<td>" + elem['price'] + "</td>"
+      rows += "<td>" + elem['size_units'] + "</td>"
+      rows += "</tr>"
+      $("#myTable").append(rows)
+    })
+  }
+  $('#myTable').tablesorter({
+      theme: 'blue'
+  });
+}
+
 function extractData(data, var1, var2) {
 	var pdata = {x: [], y: []}
 	for (var d in data) {
@@ -89,8 +126,6 @@ function extractData(data, var1, var2) {
 
 function histogram(container, series, w, h) {
   var values = series
-console.log(series)
-  // A formatter for counts.
   var formatCount = d3.format(",.0f");
 
   var margin = {top: 20, right: 15, bottom: 60, left: 60}
@@ -104,8 +139,6 @@ console.log(series)
   var data = d3.layout.histogram()
       .bins(x.ticks(10))
       (values);
-console.log([0, d3.max(data, function(d) { return d.y; })])
-console.log([height, 0])
   var y = d3.scale.linear()
       .domain([0, d3.max(data, function(d) { return d.y; })])
       .range([height, 0]);
@@ -217,6 +250,8 @@ onchange = function() {
   render()
 }
 
+var map = null;
+
 $( document ).ready(function() {
   $("#min_beds").change(onchange)
   $("#max_beds").change(onchange)
@@ -225,10 +260,21 @@ $( document ).ready(function() {
   $("#min_sqft").change(onchange)
   $("#max_sqft").change(onchange)
 
+  var center = [39.8282, -98.5795];
+  map = L.map('map').setView(center, 4);
+  L.tileLayer(
+    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18
+    }).addTo(map);
+
   new Clipboard('#btnCopy');
 
 	showWaiting()
 	render()
+  $("#tabs").tabs({
+      activate: function (event, ui) {
+          var active = $('#tabs').tabs('option', 'active');
+      }
+  });
 });
-
 
