@@ -1,280 +1,155 @@
-var baseurl = "https://home-sales-data-api.herokuapp.com"
+<html lang="en">
+  <head>
+    <title>OpenHouse data visualization</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="https://mottie.github.io/tablesorter/css/theme.blue.css" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+    <script src="code.js"></script>
+  </head>
+  <body>
+    <div id='outer'>
+      <div id='header'>
+        <div id='logo'>
+          <img src='http://dataskeptic.com/home-sales/dshs.png' id='logo' />
+        </div>
+        <div id='selectors'>
+          Beds:
+          <select id='min_beds'>
+            <option value='-1'>-1</option>
+            <option value='1'>1</option>
+            <option value='2'>2</option>
+            <option value='3'>3</option>
+            <option value='4'>4</option>
+            <option value='5'>5</option>
+            <option value='6'>6</option>
+          </select>
+          -
+          <select id='max_beds'>
+            <option value='1'>1</option>
+            <option value='2'>2</option>
+            <option value='3'>3</option>
+            <option value='4'>4</option>
+            <option value='5'>5</option>
+            <option value='6' selected>6</option>
+          </select>
+          Baths:
+          <select id='min_baths'>
+            <option value='-1'>-1</option>
+            <option value='1'>1</option>
+            <option value='2'>2</option>
+            <option value='3'>3</option>
+            <option value='4'>4</option>
+            <option value='5'>5</option>
+            <option value='6'>6</option> 
+          </select>
+          -
+          <select id='max_baths'>
+            <option value='1'>1</option>
+            <option value='2'>2</option>
+            <option value='3'>3</option>
+            <option value='4'>4</option>
+            <option value='5'>5</option>
+            <option value='6' selected>6</option>
+          </select>
+          Sq.ft.:
+          <input id='min_sqft' class='sqft' value='0' />
+          -
+          <input id='max_sqft' class='sqft' value='10000' />
 
-function render() {
-	var min_price = 0
-	var max_price = 1000000000
-	var min_beds = $('#min_beds').val()
-	var max_beds = $('#max_beds').val()
-	var min_baths = $('#min_baths').val()
-	var max_baths = $('#max_baths').val()
-	var min_sqft = $('#min_sqft').val()
-	var max_sqft = $('#max_sqft').val()
+          <br/>
 
-	request = {'min_price': min_price,
-      'max_price': max_price,
-      'min_bedrooms': min_beds,
-      'max_bedrooms': max_beds,
-      'min_bathrooms': min_baths,
-      'max_bathrooms': max_baths,
-      'min_building_size': min_sqft,
-      'max_building_size': max_sqft,
-      'limit': '500',
-      'offset': '0'
-  }
+          Address: <input id='address' />
+        </div>
+      </div>
 
-  var murl = baseurl + '/api/property/?'
-  var keys = Object.keys(request)
-  for (var i in keys) {
-  	var item = keys[i]
-  	if (i > 0) {
-  		murl += "&"
-  	}
-  	murl += item + "=" + request[item]
-  }
-  $("#curl").val('curl -X GET "' + murl + '"')
-  $.ajax({
-  	url: murl,
-  	type: 'GET',
-  	contentType: 'text/json',
-  	dataType: 'json',
-  	success: function(resp) {
-      makePlots(resp)
-      updateMap(resp)
-      updateTable(resp)
-  	},
-  	error: function() {
-  		console.log('error')
-  	}
-  })
-}
+      <div id='curlBox'>
+        cURL request: <input id="curl" value="">
+        <button class="btn" id="btnCopy" data-clipboard-target="#curl">
+            <img src="copy.png" id='copyPng' alt="Copy to clipboard">
+        </button>
+      </div>
 
-function makePlots(resp) {
-  data = resp['results']
-  var dims = ['price', 'bathrooms', 'bedrooms', 'building_size']
-  var cells = ['Price', 'Beds', 'Baths', 'Sqft']
-  if (data['count'] == 0) {
-    $(".plotCell").html("")
-    $("#errorBox").html("Your search result did not return any properties.")
-    $("#errorBox").show()
-  }
-  else {
-    var w = 200
-    var h = 200
-    for (var r=0; r < dims.length; r++) {
-      for (var c=r; c < dims.length; c++) {
-        var container = cells[r] + 'V' + cells[c]
-        xy = extractData(data, dims[r], dims[c])
-        if (r==c) {
-          histogram(container, xy['x'], w, h)
-        } else {
-          scatterplot(container, xy, w, h)
-        }
-      }
-    }    
-  }
-}
+      <div id='errorBox'>Err</div>
 
-function updateMap(resp) {
-  console.log(resp)
-  if (resp['count'] > 0) {
-    data = resp['results']
-    console.log(data)
-    //var center = [39.8282, -98.5795];
-    //L.marker(center).addTo(map);  
-  }
-  else {
-    console.log("No listings to update")
-  }
-}
-
-function updateTable(resp) {
-  $("#myTable tr").remove(); 
-  if (resp['count'] > 0) {
-    data = resp['results']
-    $.each(data, function(i, elem) {
-      var rows = "<tr>"
-      rows += "<td>" + elem['geocoded_address'] + "</td>"
-      rows += "<td>" + elem['bedrooms'] + "</td>"
-      rows += "<td>" + elem['bathrooms'] + "</td>"
-      rows += "<td>" + elem['building_size'] + "</td>"
-      rows += "<td>" + elem['var_spaces'] + "</td>"
-      rows += "<td>" + elem['listing_type'] + "</td>"
-      rows += "<td>" + elem['price'] + "</td>"
-      rows += "<td>" + elem['size_units'] + "</td>"
-      rows += "</tr>"
-      $("#myTable").append(rows)
-    })
-  }
-  $('#myTable').tablesorter({
-      theme: 'blue'
-  });
-}
-
-function extractData(data, var1, var2) {
-	var pdata = {x: [], y: []}
-	for (var d in data) {
-		var property = data[d]
-    if (property != null) {
-  		x = property[var1]
-  		y = property[var2]
-  		pdata['x'].push(x)
-  		pdata['y'].push(y)
-    }
-	}
-	return pdata
-}
-
-function histogram(container, series, w, h) {
-  var values = series
-  var formatCount = d3.format(",.0f");
-
-  var margin = {top: 20, right: 15, bottom: 60, left: 60}
-      width = w - margin.left - margin.right,
-      height = h - margin.top - margin.bottom;
-
-  var x = d3.scale.linear()
-      .domain([0, Math.max(...values)])
-      .range([0, width]);
-
-  var data = d3.layout.histogram()
-      .bins(x.ticks(10))
-      (values);
-  var y = d3.scale.linear()
-      .domain([0, d3.max(data, function(d) { return d.y; })])
-      .range([height, 0]);
-
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-  xAxis.ticks(2)
-
-  $("#" + container).html('')
-  var svg = d3.select("#" + container).append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  var bar = svg.selectAll(".bar")
-      .data(data)
-    .enter().append("g")
-      .attr("class", "bar")
-      .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-
-  bar.append("rect")
-      .attr("x", 1)
-      .attr("width", x(data[0].dx) - 1)
-      .attr("height", function(d) { return height - y(d.y); });
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-}
-
-function scatterplot(container, xy, w, h) {
-  var xdata = xy['x']
-  var ydata = xy['y']
-
-  // size and margins for the chart
-  var margin = {top: 20, right: 15, bottom: 60, left: 60}
-    , width = w - margin.left - margin.right
-    , height = h - margin.top - margin.bottom;
-
-  var x = d3.scale.linear()
-            .domain([0, d3.max(xdata)])
-            .range([ 0, width ])
-
-  var y = d3.scale.linear()
-            .domain([0, d3.max(ydata)])
-            .range([ height, 0 ])
-
-  $('#' + container).html('')
-  var chart = d3.select('#' + container)
-  .append('svg:svg')
-  .attr('width', width + margin.right + margin.left)
-  .attr('height', height + margin.top + margin.bottom)
-  .attr('class', 'chart')
-
-  // the main object where the chart and axis will be drawn
-  var main = chart.append('g')
-  .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-  .attr('width', width)
-  .attr('height', height)
-  .attr('class', 'main')   
-
-  // draw the x axis
-  var xAxis = d3.svg.axis()
-  .scale(x)
-  .orient('bottom');
-
-  xAxis.ticks(2)
-
-  main.append('g')
-  .attr('transform', 'translate(0,' + height + ')')
-  .attr('class', 'main axis date')
-  .call(xAxis);
-
-  // draw the y axis
-  var yAxis = d3.svg.axis()
-  .scale(y)
-  .orient('left');
-
-  yAxis.ticks(3)
-
-  main.append('g')
-  .attr('transform', 'translate(0,0)')
-  .attr('class', 'main axis date')
-  .call(yAxis);
-
-  // draw the graph object
-  var g = main.append("svg:g"); 
-
-  g.selectAll("scatter-dots")
-    .data(ydata)  // using the values in the ydata array
-    .enter().append("svg:circle")  // create a new circle for each value
-        .attr("cy", function (d) { return y(d); } ) // translate y value to a pixel
-        .attr("cx", function (d,i) { return x(xdata[i]); } ) // translate x value
-        .attr("r", 2) // radius of circle
-        .style("opacity", 0.5); // opacity of circle
-}
-
-function showWaiting() {
-  $("#errorBox").hide()
-	$(".plotCell").html("<img src='box.gif' />")
-}
-
-onchange = function() {
-  showWaiting()
-  render()
-}
-
-var map = null;
-
-$( document ).ready(function() {
-  $("#min_beds").change(onchange)
-  $("#max_beds").change(onchange)
-  $("#min_baths").change(onchange)
-  $("#max_baths").change(onchange)
-  $("#min_sqft").change(onchange)
-  $("#max_sqft").change(onchange)
-
-  var center = [39.8282, -98.5795];
-  map = L.map('map').setView(center, 4);
-  L.tileLayer(
-    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18
-    }).addTo(map);
-
-  new Clipboard('#btnCopy');
-
-	showWaiting()
-	render()
-  $("#tabs").tabs({
-      activate: function (event, ui) {
-          var active = $('#tabs').tabs('option', 'active');
-      }
-  });
-});
+      <div id="tabs">
+          <ul>
+              <li><a href="#tabs-1">Analysis</a>
+              </li>
+              <li><a href="#tabs-2">Map</a>
+              </li>
+              <li><a href="#tabs-3">Raw data</a>
+              </li>
+          </ul>
+          <div id="tabs-1">
+            <table id='myTable' class="tablesorter">
+            <thead>
+              <tr>
+                <th>Address</th>
+                <th>Bedrooms</th>
+                <th>Bathrooms</th>
+                <th>Sq.ft.</th>
+                <th>Car spaces</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Units</th>
+            </thead>
+            <tbody>
+            </tbody>
+            </table>
+          </div>
+          <div id="tabs-3">
+            <table>
+              <tr>
+                <td></td>
+                <td class="headerRow"><span class='valLabel'>Price</span></td>
+                <td class="headerRow"><span class='valLabel'>Beds</span></td>
+                <td class="headerRow"><span class='valLabel'>Baths</span></td>
+                <td class="headerRow"><span class='valLabel'>Sqft</span></td>
+              </tr>
+              <tr>
+                <td><span class='valLabel'>Price</span></td>
+                <td class='plotCell' id='PriceVPrice'></td>
+                <td class='plotCell' id='PriceVBeds'></td>
+                <td class='plotCell' id='PriceVBaths'></td>
+                <td class='plotCell' id='PriceVSqft'></td>
+              </tr>
+              <tr>
+                <td><span class='valLabel'>Beds</span></td>
+                <td></td>
+                <td class='plotCell' id='BedsVBeds'></td>
+                <td class='plotCell' id='BedsVBaths'></td>
+                <td class='plotCell' id='BedsVSqft'></td>
+              </tr>
+              <tr>
+                <td><span class='valLabel'>Baths</span></td>
+                <td></td>
+                <td></td>
+                <td class='plotCell' id='BathsVBaths'></td>
+                <td class='plotCell' id='BathsVSqft'></td>
+              </tr>
+              <tr>
+                <td><span class='valLabel'>Sqft</span></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class='plotCell' id='SqftVSqft'></td>
+              </tr>
+            </table>
+          </div>
+          <div id="tabs-2">
+            <div id='map'></div>
+          </div>
+      </div>
+      <div id='footer'>
+      </div>
+    </div>
+  </body>
+</html>
 
