@@ -3,8 +3,12 @@
     <title>OpenHouse data visualization</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="https://mottie.github.io/tablesorter/css/theme.blue.css" />
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
     <script src="code.js"></script>
@@ -74,52 +78,78 @@
 
       <div id='errorBox'>Err</div>
 
-      <div id='center'>
-        <table>
-          <tr>
-            <td></td>
-            <td class="headerRow"><span class='valLabel'>Price</span></td>
-            <td class="headerRow"><span class='valLabel'>Beds</span></td>
-            <td class="headerRow"><span class='valLabel'>Baths</span></td>
-            <td class="headerRow"><span class='valLabel'>Sqft</span></td>
-          </tr>
-          <tr>
-            <td><span class='valLabel'>Price</span></td>
-            <td class='plotCell' id='PriceVPrice'></td>
-            <td class='plotCell' id='PriceVBeds'></td>
-            <td class='plotCell' id='PriceVBaths'></td>
-            <td class='plotCell' id='PriceVSqft'></td>
-          </tr>
-          <tr>
-            <td><span class='valLabel'>Beds</span></td>
-            <td></td>
-            <td class='plotCell' id='BedsVBeds'></td>
-            <td class='plotCell' id='BedsVBaths'></td>
-            <td class='plotCell' id='BedsVSqft'></td>
-          </tr>
-          <tr>
-            <td><span class='valLabel'>Baths</span></td>
-            <td></td>
-            <td></td>
-            <td class='plotCell' id='BathsVBaths'></td>
-            <td class='plotCell' id='BathsVSqft'></td>
-          </tr>
-          <tr>
-            <td><span class='valLabel'>Sqft</span></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class='plotCell' id='SqftVSqft'></td>
-          </tr>
-        </table>
-      </div>
-      <div id='map'>
-         <div id="mapid"></div>
+      <div id="tabs">
+          <ul>
+              <li><a href="#tabs-1">Analysis</a>
+              </li>
+              <li><a href="#tabs-2">Map</a>
+              </li>
+              <li><a href="#tabs-3">Raw data</a>
+              </li>
+          </ul>
+          <div id="tabs-1">
+            <table>
+              <tr>
+                <td></td>
+                <td class="headerRow"><span class='valLabel'>Price</span></td>
+                <td class="headerRow"><span class='valLabel'>Beds</span></td>
+                <td class="headerRow"><span class='valLabel'>Baths</span></td>
+                <td class="headerRow"><span class='valLabel'>Sqft</span></td>
+              </tr>
+              <tr>
+                <td><span class='valLabel'>Price</span></td>
+                <td class='plotCell' id='PriceVPrice'></td>
+                <td class='plotCell' id='PriceVBeds'></td>
+                <td class='plotCell' id='PriceVBaths'></td>
+                <td class='plotCell' id='PriceVSqft'></td>
+              </tr>
+              <tr>
+                <td><span class='valLabel'>Beds</span></td>
+                <td></td>
+                <td class='plotCell' id='BedsVBeds'></td>
+                <td class='plotCell' id='BedsVBaths'></td>
+                <td class='plotCell' id='BedsVSqft'></td>
+              </tr>
+              <tr>
+                <td><span class='valLabel'>Baths</span></td>
+                <td></td>
+                <td></td>
+                <td class='plotCell' id='BathsVBaths'></td>
+                <td class='plotCell' id='BathsVSqft'></td>
+              </tr>
+              <tr>
+                <td><span class='valLabel'>Sqft</span></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class='plotCell' id='SqftVSqft'></td>
+              </tr>
+            </table>
+          </div>
+          <div id="tabs-2">
+            <div id='map'></div>
+          </div>
+          <div id="tabs-1">
+            <table id='myTable' class="tablesorter">
+            <thead>
+              <tr>
+                <th>Address</th>
+                <th>Bedrooms</th>
+                <th>Bathrooms</th>
+                <th>Sq.ft.</th>
+                <th>Car spaces</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Units</th>
+            </thead>
+            <tbody>
+            </tbody>
+            </table>
+          </div>
       </div>
       <div id='footer'>
       </div>
     </div>
   </body>
 </html>
-
 

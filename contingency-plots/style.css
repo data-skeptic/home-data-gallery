@@ -92,4 +92,12 @@ input {
 #mapid { 
 	height: 180px; 
 }
+#map { height: 500px; }
 
+
+#tabs {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
