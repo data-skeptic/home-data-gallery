@@ -78,7 +78,7 @@ function updateMap(resp) {
   console.log(resp)
   if (resp['count'] > 0) {
     data = resp['results']
-    console.log(data)
+    //console.log(data)
     //var center = [39.8282, -98.5795];
     //L.marker(center).addTo(map);  
   }
@@ -88,11 +88,13 @@ function updateMap(resp) {
 }
 
 function updateTable(resp) {
-  $("#myTable tr").remove(); 
+  console.log("updating table")
+  $("#data-table-tbody tr").remove(); 
   if (resp['count'] > 0) {
     data = resp['results']
+    var rows = ""
     $.each(data, function(i, elem) {
-      var rows = "<tr>"
+      rows += "<tr>"
       rows += "<td>" + elem['geocoded_address'] + "</td>"
       rows += "<td>" + elem['bedrooms'] + "</td>"
       rows += "<td>" + elem['bathrooms'] + "</td>"
@@ -102,8 +104,8 @@ function updateTable(resp) {
       rows += "<td>" + elem['price'] + "</td>"
       rows += "<td>" + elem['size_units'] + "</td>"
       rows += "</tr>"
-      $("#myTable").append(rows)
     })
+    $("#data-table-tbody").append(rows)
   }
   $('#myTable').tablesorter({
       theme: 'blue'
@@ -277,4 +279,5 @@ $( document ).ready(function() {
       }
   });
 });
+
 
