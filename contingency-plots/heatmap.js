@@ -1,4 +1,5 @@
-	function heatmap(data, container) {
+	function heatmap(container, data) {
+		$(container).html('')
 		var width = $(container).width()
 		var height = $(container).height()
 		var xoffset = 30 // Going to use this to put axis in
@@ -28,8 +29,8 @@
 				min_c = item['c']
 			}
 		})
-		var w = (width  - xoffset) / max_r
-		var h = (height - yoffset) / max_c
+		var w = (width  - xoffset) / (max_r - min_r + 1)
+		var h = (height - yoffset) / (max_c - min_c + 1)
 
 		var svgContainer = d3.select(container).append("svg")
 		                                    .attr("width", width)
