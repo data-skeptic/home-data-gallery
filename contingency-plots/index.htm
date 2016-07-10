@@ -12,6 +12,9 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
     <script src="code.js"></script>
+    <script src="vizheatmap.js"></script>
+    <script src="heatmap.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
   </head>
   <body>
     <div id='outer'>
@@ -127,9 +130,15 @@
             </table>
           </div>
           <div id="tabs-2">
+            <div id='map-spinner' class='wait-spinner'>
+              <img src="box.gif" />
+            </div>
             <div id='map'></div>
           </div>
-          <div id="tabs-1">
+          <div id="tabs-3">
+            <div id='table-spinner' class='wait-spinner'>
+              <img src="box.gif" />
+            </div>
             <table id='myTable' class="tablesorter">
             <thead>
               <tr>
@@ -142,7 +151,7 @@
                 <th>Price</th>
                 <th>Units</th>
             </thead>
-            <tbody>
+            <tbody id='data-table-tbody'>
             </tbody>
             </table>
           </div>
