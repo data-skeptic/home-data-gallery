@@ -1,0 +1,37 @@
+<html>
+   <head>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="heatmap.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+   </head>
+   <body>
+   <h1>Heatmap demo</h1>
+   <p>This page exists to provide a demo for using heatmap.js.  First, include it in the head.  Then, set up a dedicated div.  Format yoru data like `data` is formatted below.  Then call the `heatmap` function and provide the data and the name of the container to populate.</p>
+   <p>IMPORTANT: make sure YOU set the height and width of the target container div with CSS, otherwise it might get sized to 0x0</p>
+   <h3>Improvements to make:</h3>
+   <ul>
+    <li>Provide axis labels.</li>
+    <li>Better color choice</li>
+    <li>Legend for how to interpret color</li>
+    <li>Change to probabilities, and maybe have the frequency appear on hover</li>
+   <div id="hm">
+   </div>
+   <style>
+   #hm {
+   	width: 200px;
+   	height: 200px;
+   }
+   </style>
+   <script type="text/javascript">
+
+	var data = [
+	  { "r": 1, "c": 1, "count" : 10 },
+	  { "r": 2, "c": 2, "count" : 6 },
+	  { "r": 3, "c": 3, "count" : 3 },
+	  { "r": 3, "c": 1, "count" : 8 }];
+
+	heatmap("#hm", data)
+
+   </script>
+   </body>
+</html>
