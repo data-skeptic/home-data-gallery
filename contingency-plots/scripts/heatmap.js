@@ -59,7 +59,6 @@
 					var color = "#" + color_part_hex + color_part_hex + "00";
 					return color;
 				});
-	    console.log(data)
 		var text = svgContainer.selectAll("text")
 		                        .data(data)
 		                        .enter()
@@ -74,3 +73,4 @@
 			           .text(function (d) { return d.count })
 		// max_r, max_c
    	}
+

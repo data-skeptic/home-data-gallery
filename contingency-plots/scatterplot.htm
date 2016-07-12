@@ -1,0 +1,36 @@
+<html>
+   <head>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="scripts/scatterplot.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+   </head>
+   <body>
+   <h1>Scatterplot demo</h1>
+   <p>This page exists to provide a demo for using scatterplot.js.  First, include it in the head.  Then, set up a dedicated div.  Format yoru data like `data` is formatted below.  Then call the `scatterplot` function and provide the data and the name of the container to populate.</p>
+   <p>IMPORTANT: make sure YOU set the height and width of the target container div with CSS, otherwise it might get sized to 0x0</p>
+   <h3>Improvements to make:</h3>
+   <ul>
+    <li>More attractive CSS; better line widths, for example</li>
+    <li>Better tick frequency; show min and max always; not too many ticks</li>
+   </ul>
+   <div id="hm">
+   </div>
+   <style>
+   #hm {
+   	width: 200px;
+   	height: 200px;
+   }
+   </style>
+   <script type="text/javascript">
+
+	var data = {
+		x: [1, 2, 3, 4, 5], 
+		y: [5, 4, 3, 10, 1]
+	}
+
+	scatterplot("#hm", data, 200, 200)
+
+   </script>
+   </body>
+</html>
+

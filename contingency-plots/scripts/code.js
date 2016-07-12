@@ -1,4 +1,4 @@
-var baseurl = "https://home-sales-data-api.herokuapp.com"
+var baseurl = "http://api.openhouseproject.co"
 
 var response = null
 
@@ -69,7 +69,7 @@ function makePlots(resp) {
         var container = cells[r] + 'V' + cells[c]
         xy = extractData(data, dims[r], dims[c])
         if (r==c) {
-          histogram(container, xy['x'], w, h)
+          histogram("#" + container, xy['x'], w, h)
         } else if (dims[r] == 'bathrooms' && dims[c] == 'bedrooms' || dims[c] == 'bathrooms' && dims[r] == 'bedrooms') {
           agg = aggregateData(data, dims[r], dims[c])
           heatmap("#" + container, agg)
@@ -129,37 +129,6 @@ function updateMap(resp) {
     }
 }
 
-function updateTable(resp) {
-  console.log("updating table")
-  $("#data-table-tbody tr").remove(); 
-  if (resp['count'] > 0) {
-    data = resp['results']
-    var rows = ""
-    $.each(data, function(i, elem) {
-      rows += "<tr>"
-      var fa = "missing"
-      if (elem['address_object'] != null) {
-        if (elem['address_object']['formatted_address'] != null) {
-          fa = elem['address_object']['formatted_address']
-        }
-      }
-      rows += "<td>" + fa + "</td>"
-      rows += "<td>" + elem['bedrooms'] + "</td>"
-      rows += "<td>" + elem['bathrooms'] + "</td>"
-      rows += "<td>" + elem['building_size'] + "</td>"
-      rows += "<td>" + elem['var_spaces'] + "</td>"
-      rows += "<td>" + elem['listing_type'] + "</td>"
-      rows += "<td>" + elem['price'] + "</td>"
-      rows += "<td>" + elem['size_units'] + "</td>"
-      rows += "</tr>"
-    })
-    $("#data-table-tbody").append(rows)
-  }
-  $('#myTable').tablesorter({
-      theme: 'blue'
-  });
-}
-
 function extractData(data, var1, var2) {
 	var pdata = {x: [], y: []}
 	for (var d in data) {
@@ -176,63 +145,6 @@ function extractData(data, var1, var2) {
 	return pdata
 }
 
-function histogram(container, series, w, h) {
-  var values = series
-  var formatCount = d3.format(",.0f");
-
-  var margin = {top: 20, right: 15, bottom: 60, left: 60}
-      width = w - margin.left - margin.right,
-      height = h - margin.top - margin.bottom;
-
-  var x = d3.scale.linear()
-      .domain([0, Math.max(...values)])
-      .range([0, width]);
-
-  var data = d3.layout.histogram()
-      .bins(x.ticks(10))
-      (values);
-  var y = d3.scale.linear()
-      .domain([0, d3.max(data, function(d) { return d.y; })])
-      .range([height, 0]);
-
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-  xAxis.ticks(2)
-
-  $("#" + container).html('')
-  var svg = d3.select("#" + container).append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  var bar = svg.selectAll(".bar")
-      .data(data)
-    .enter().append("g")
-      .attr("class", "bar")
-      .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-
-  bar.append("rect")
-      .attr("x", 1)
-      .attr("width", function(d) { return x(d.x) })
-      .attr("height", function(d) { return height - y(d.y); });
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-}
-
-/*
-          var data = [
-            { "r": 1, "c": 1, "count" : 10 },
-            { "r": 2, "c": 2, "count" : 6 },
-            { "r": 3, "c": 3, "count" : 3 },
-            { "r": 3, "c": 1, "count" : 8 }];
-
-*/
 function aggregateData(data, var1, var2) {
   counter = {}
   $.each(data, function(i, elem) {
@@ -259,72 +171,6 @@ function aggregateData(data, var1, var2) {
     })
   })
   return agg
-}
-
-function scatterplot(container, xy, w, h) {
-  var xdata = xy['x']
-  var ydata = xy['y']
-
-  // size and margins for the chart
-  var margin = {top: 20, right: 15, bottom: 60, left: 60}
-    , width = w - margin.left - margin.right
-    , height = h - margin.top - margin.bottom;
-
-  var x = d3.scale.linear()
-            .domain([0, d3.max(xdata)])
-            .range([ 0, width ])
-
-  var y = d3.scale.linear()
-            .domain([0, d3.max(ydata)])
-            .range([ height, 0 ])
-
-  $(container).html('')
-  var chart = d3.select(container)
-  .append('svg:svg')
-  .attr('width', width + margin.right + margin.left)
-  .attr('height', height + margin.top + margin.bottom)
-  .attr('class', 'chart')
-
-  // the main object where the chart and axis will be drawn
-  var main = chart.append('g')
-  .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-  .attr('width', width)
-  .attr('height', height)
-  .attr('class', 'main')   
-
-  // draw the x axis
-  var xAxis = d3.svg.axis()
-  .scale(x)
-  .orient('bottom');
-
-  xAxis.ticks(2)
-
-  main.append('g')
-  .attr('transform', 'translate(0,' + height + ')')
-  .attr('class', 'main axis date')
-  .call(xAxis);
-
-  // draw the y axis
-  var yAxis = d3.svg.axis()
-  .scale(y)
-  .orient('left');
-
-  yAxis.ticks(3)
-
-  main.append('g')
-  .attr('transform', 'translate(0,0)')
-  .attr('class', 'main axis date')
-  .call(yAxis);
-
-  // draw the graph object
-  var g = main.append("svg:g")
-  g.selectAll("scatter-dots")
-    .data(ydata)  // using the values in the ydata array
-    .enter().append("svg:circle")  // create a new circle for each value
-        .attr("cy", function (d,i) { return y(ydata[i]); } ) // translate y value to a pixel
-        .attr("cx", function (d,i) { return x(xdata[i]); } ) // translate x value
-        .attr("r", 2) // radius of circle
-        .style("opacity", 0.5); // opacity of circle
 }
 
 function showWaiting() {
@@ -367,4 +213,5 @@ $( document ).ready(function() {
       }
   });
 });
+
 

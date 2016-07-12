@@ -1,0 +1,45 @@
+<html>
+   <head>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="scripts/updateTable.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.26.2/js/jquery.tablesorter.min.js"></script>
+    <link rel="stylesheet" href="https://mottie.github.io/tablesorter/css/theme.blue.css" />
+   </head>
+   <body>
+   <h1>Table demo</h1>
+   <p>This page exists to provide a demo for using updateTable.js.  First, include it in the head.  Then, set up a dedicated div.  Format yoru data like `data` is formatted below.  Then call the `updateTable` function and provide the data and the name of the container to populate.</p>
+   <h3>Improvements to make:</h3>
+   <ul>
+    <li>?</li>
+   </ul>
+    <table id='myTable' class="tablesorter">
+    <thead>
+      <tr>
+        <th>Address</th>
+        <th>Bedrooms</th>
+        <th>Bathrooms</th>
+        <th>Sq.ft.</th>
+        <th>Car spaces</th>
+        <th>Type</th>
+        <th>Price</th>
+        <th>Units</th>
+    </thead>
+    <tbody id='data-table-tbody'>
+    </tbody>
+    </table>
+   <style>
+   </style>
+   <script type="text/javascript">
+
+	updateTable(getResponse())
+
+	function getResponse() {
+		var response = JSON.parse('{"count":474938,"next":"http://home-sales-data-api.herokuapp.com/api/property/?limit=500&max_bathrooms=6&max_bedrooms=6&max_building_size=10000&max_price=1000000000&min_bathrooms=-1&min_bedrooms=-1&min_building_size=0&min_price=0&offset=500","previous":null,"results":[{"id":94903,"submitter":1,"address_object":{"id":95732,"subpremise":null,"street_number":140,"route":"Penwood Lane", "locality":"Folsom","area_level_2":"Sacramento County","area_level_1":"California","country":"United States","postal_code":"95630","formatted_address":"140 Penwood Ln, Folsom, CA 95630, USA","latitude":38.6622724,"longitude":-121.1199262},"upload_timestamp":"2016-06-23T03:26:45.724429Z","listing_timestamp":"2015-08-13T19:00:48Z","listing_type":"S","price":380000.0,"bedrooms":-1.0,"bathrooms":-1.0,"car_spaces":null,"building_size":-1.0,"land_size":null,"size_units":"I","raw_address":"140 Penwood Ln Folsom , CA 95630","valid":false,"features":[]},{"id":497,"submitter":1,"address_object":{"id":501,"subpremise":null,"street_number":3243,"route":"Irvindale Way","locality":"Antelope","area_level_2":"Sacramento County","area_level_1":"California","country":"United States","postal_code":"95843","formatted_address":"3243 Irvindale Way, Antelope, CA 95843, USA","latitude":38.707934,"longitude":-121.391093},"upload_timestamp":"2016-06-22T07:40:07.161729Z","listing_timestamp":"2015-08-13T19:04:19Z","listing_type":"S","price":200000.0,"bedrooms":-1.0,"bathrooms":-1.0,"car_spaces":null,"building_size":-1.0,"land_size":null,"size_units":"I","raw_address":"3243 Irvindale Way Antelope , CA 95843","valid":false,"features":[]}]}')
+		return response
+	}
+   </script>
+   </body>
+</html>
+
+

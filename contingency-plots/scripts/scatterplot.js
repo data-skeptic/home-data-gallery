@@ -63,3 +63,4 @@ function scatterplot(container, xy, w, h) {
         .attr("r", 2) // radius of circle
         .style("opacity", 0.5); // opacity of circle
 }
+
