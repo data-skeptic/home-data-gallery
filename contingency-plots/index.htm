@@ -16,7 +16,8 @@
     <script src="scripts/scatterplot.js"></script>
     <script src="scripts/histogram.js"></script>
     <script src="scripts/updateTable.js"></script>
-    <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
+    <script src="scripts/map.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/lib/OpenLayers.js"></    <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
   </head>
   <body>
     <div id='outer'>
@@ -85,14 +86,27 @@
 
       <div id="tabs">
           <ul>
-              <li><a href="#tabs-1">Analysis</a>
+              <li><a href="#tabs-1">Map</a>
               </li>
-              <li><a href="#tabs-2">Map</a>
+              <li><a href="#tabs-2">Analysis</a>
               </li>
               <li><a href="#tabs-3">Raw data</a>
               </li>
           </ul>
           <div id="tabs-1">
+            <div id='map-spinner' class='wait-spinner'>
+              <img src="box.gif" />
+            </div>
+            <!-- 
+            38.7564, -121.4276
+            38.6767, -121.3083
+            -->
+            <div id='mapContainer'>
+              <div id='map'></div>
+              <div id='info'></div>
+            </div>
+          </div>
+          <div id="tabs-2">
             <table>
               <tr>
                 <td></td>
@@ -130,12 +144,6 @@
                 <td class='plotCell' id='SqftVSqft'></td>
               </tr>
             </table>
-          </div>
-          <div id="tabs-2">
-            <div id='map-spinner' class='wait-spinner'>
-              <img src="box.gif" />
-            </div>
-            <div id='map'></div>
           </div>
           <div id="tabs-3">
             <div id='table-spinner' class='wait-spinner'>
