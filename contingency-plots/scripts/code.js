@@ -81,48 +81,28 @@ function makePlots(resp) {
   }
 }
 
-function addMarker(location, name, active) {          
-    var marker = new google.maps.Marker({
-        position: location,
-        map: map,
-        title: name,
-        status: active
-    });
-}
-
 function updateMap(resp) {
     if (resp['count'] > 0) {
-      var bounds = new google.maps.LatLngBounds()
       data = resp['results']
       var latlngs = []
       var error_count = 0
       $.each(data, function(i, elem) {
         var ao = elem['address_object']
         if (ao != null) {
-          var lat = ao['latitude']
-          var lng = ao['longitude']
-          var latlng = [lat, lng]
-          latlngs.push(latlng)
+          property = {
+            "address": ao['formatted_address'],
+            "sale_price": elem['price'],
+            "bedrooms": elem['bedrooms'],
+            "bathrooms": elem['bathrooms'],
+            "latitude": ao['latitude'],
+            "longitude": ao['longitude']
+          }
+          add_marker(property)
         } else {
           error_count += 1
         }
       })
       console.log("There were " + error_count + " listings missing `address_object`")
-      $.each(latlngs, function(i, elem) {
-        loc = new google.maps.LatLng(elem[0], elem[1]);
-        bounds.extend(loc);
-        L.marker(elem).addTo(map)
-
-
-        //marker.setMap(map);        
-
-
-
-      })
-      //map.fitBounds(bounds)
-      //map.panToBounds(bounds)
-      //[bounds.getCenter().lat(), bounds.getCenter().lng()]
-      //map.setZoom(6)
     }
     else {
       console.log("No listings to update")
@@ -193,15 +173,7 @@ $( document ).ready(function() {
   $("#max_baths").change(onchange)
   $("#min_sqft").change(onchange)
   $("#max_sqft").change(onchange)
-
-  var clat = 39.8282
-  var clng = -98.5795
-  var initial_center = {'lat': clat, 'lng': clng};
-  map = L.map('map').setView([clat, clng], 4);
-  L.tileLayer(
-    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18
-    }).addTo(map);
+  mapInit('map', 'info', [], 39.50, -98.35, 4)
 
   new Clipboard('#btnCopy');
 
