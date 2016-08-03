@@ -92,8 +92,17 @@ input {
 #mapid { 
 	height: 180px; 
 }
-#map { height: 500px; }
-
+#map { 
+    height: 500px;
+    width: 80%;
+    float: left;
+    margin: 0;
+}
+#info {
+    width: 20%;
+    height: 100%;
+    margin-left: 80%;
+}
 
 #tabs {
     width: 95%;
@@ -102,3 +111,7 @@ input {
     margin-top: 10px;
 }
 
+
+.propertyDetailBox {
+  border-style: solid;
+}
