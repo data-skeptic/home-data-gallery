@@ -181,8 +181,8 @@ $( document ).ready(function() {
     render()
   })
 
-  sliders['bed'] = slider("#slide_bed", 1, 6, [-1, 3], "Beds: ")
-  sliders['bath'] = slider("#slide_bath", 1, 4, [-1, 2], "Baths: ")
+  sliders['bed'] = slider("#slide_bed", -1, 6, [1, 3], "Beds: ")
+  sliders['bath'] = slider("#slide_bath", -1, 4, [1, 2], "Baths: ")
   sliders['price'] = slider("#slide_price", -1, max_price, [min_price, max_price], "Price: ")
   sliders['sqft'] = slider("#slide_sqft", -1, max_sqft, [-1, max_sqft], "SQ.FT.: ")
 
