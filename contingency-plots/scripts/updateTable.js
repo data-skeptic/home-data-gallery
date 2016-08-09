@@ -27,5 +27,3 @@ function updateTable(resp) {
       theme: 'blue'
   });
 }
-
-

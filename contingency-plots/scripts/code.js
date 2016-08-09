@@ -3,14 +3,18 @@ var baseurl = "http://api.openhouseproject.co"
 var response = null
 
 function render() {
-	var min_price = 0
-	var max_price = 1000000000
-	var min_beds = $('#min_beds').val()
-	var max_beds = $('#max_beds').val()
-	var min_baths = $('#min_baths').val()
-	var max_baths = $('#max_baths').val()
-	var min_sqft = $('#min_sqft').val()
-	var max_sqft = $('#max_sqft').val()
+  var min_price = 0
+  var max_price = 1000000000
+  svals = sliders['bed'].noUiSlider.get()
+  var min_beds = parseFloat(svals[0])
+  var max_beds = parseFloat(svals[1])
+  svals = sliders['bath'].noUiSlider.get()
+  var min_baths = parseFloat(svals[0])
+  var max_baths = parseFloat(svals[1])
+  svals = sliders['sqft'].noUiSlider.get()
+  var min_sqft = parseFloat(svals[0])
+  var max_sqft = parseFloat(svals[1])
+  svals = sliders['price'].noUiSlider.get()
 
 	request = {'min_price': min_price,
       'max_price': max_price,
@@ -164,15 +168,23 @@ onchange = function() {
   render()
 }
 
-var map = null;
+var map = null
+var sliders = {}
 
 $( document ).ready(function() {
-  $("#min_beds").change(onchange)
-  $("#max_beds").change(onchange)
-  $("#min_baths").change(onchange)
-  $("#max_baths").change(onchange)
-  $("#min_sqft").change(onchange)
-  $("#max_sqft").change(onchange)
+  max_price=10000000
+  max_sqft=10000
+
+  $("#btnSearch").click(function() {
+    showWaiting()
+    render()
+  })
+
+  sliders['bed'] = slider("#slide_bed", -1, 6, [-1, 3], "Beds: ")
+  sliders['bath'] = slider("#slide_bath", -1, 4, [-1, 2], "Baths: ")
+  sliders['price'] = slider("#slide_price", -1, max_price, [-1, max_price], "Price: ")
+  sliders['sqft'] = slider("#slide_sqft", -1, max_sqft, [-1, max_sqft], "SQ.FT.: ")
+
   mapInit('map', 'info', [], 39.50, -98.35, 4)
 
   new Clipboard('#btnCopy');

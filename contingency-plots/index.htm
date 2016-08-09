@@ -17,7 +17,10 @@
     <script src="scripts/histogram.js"></script>
     <script src="scripts/updateTable.js"></script>
     <script src="scripts/map.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/lib/OpenLayers.js"></    <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
+    <script src="scripts/slider.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/lib/OpenLayers.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
   </head>
   <body>
     <div id='outer'>
@@ -26,60 +29,45 @@
           <img src='http://dataskeptic.com/home-sales/dshs.png' id='logo' />
         </div>
         <div id='selectors'>
-          Beds:
-          <select id='min_beds'>
-            <option value='-1'>-1</option>
-            <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6'>6</option>
-          </select>
-          -
-          <select id='max_beds'>
-            <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6' selected>6</option>
-          </select>
-          Baths:
-          <select id='min_baths'>
-            <option value='-1'>-1</option>
-            <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6'>6</option> 
-          </select>
-          -
-          <select id='max_baths'>
-            <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6' selected>6</option>
-          </select>
-          Sq.ft.:
-          <input id='min_sqft' class='sqft' value='0' />
-          -
-          <input id='max_sqft' class='sqft' value='10000' />
-
-          <br/>
-
-          Address: <input id='address' />
+          <div id='selector_left'>
+            <div id='bed_outer' class='slider_outer'>
+              <div>
+                <div id='slide_bed' class='allsliders slider_ui'></div>
+                <div id='slide_bed_val' class='allsliders slider_vals'></div>
+              </div>
+            </div>
+            <div id='bath_outer' class='slider_outer'>
+              <div>
+                <div id='slide_bath' class='allsliders slider_ui'></div>
+                <div id='slide_bath_val' class='allsliders slider_vals'></div>
+              </div>
+            </div>
+          </div>
+          <div id='selector_right'>
+            <div id='bed_outer' class='slider_outer'>
+              <div>
+                <div id='slide_price' class='allsliders slider_ui'></div>
+                <div id='slide_price_val' class='allsliders slider_vals'></div>
+              </div>
+            </div>
+            <div id='bath_outer' class='slider_outer'>
+              <div>
+                <div id='slide_sqft' class='allsliders slider_ui'></div>
+                <div id='slide_sqft_val' class='allsliders slider_vals'></div>
+              </div>
+            </div>
+          </div>
+          <div id='search_box'>
+            <span class="ui_label">Address: </span><input id='address' />
+            <button id="btnSearch">Search</button>
+          </div>
         </div>
-      </div>
-
-      <div id='curlBox'>
-        cURL request: <input id="curl" value="">
-        <button class="btn" id="btnCopy" data-clipboard-target="#curl">
-            <img src="copy.png" id='copyPng' alt="Copy to clipboard">
-        </button>
+        <div id='curlBox'>
+          <span class="ui_label">cURL request: </span><input id="curl" value="">
+          <button class="btn" id="btnCopy" data-clipboard-target="#curl">
+              <img src="copy.png" id='copyPng' alt="Copy to clipboard">
+          </button>
+        </div>
       </div>
 
       <div id='errorBox'>Err</div>
