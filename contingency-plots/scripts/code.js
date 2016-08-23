@@ -173,6 +173,7 @@ var sliders = {}
 
 $( document ).ready(function() {
   max_price=10000000
+  min_price=  100000
   max_sqft=10000
 
   $("#btnSearch").click(function() {
@@ -180,9 +181,9 @@ $( document ).ready(function() {
     render()
   })
 
-  sliders['bed'] = slider("#slide_bed", -1, 6, [-1, 3], "Beds: ")
-  sliders['bath'] = slider("#slide_bath", -1, 4, [-1, 2], "Baths: ")
-  sliders['price'] = slider("#slide_price", -1, max_price, [-1, max_price], "Price: ")
+  sliders['bed'] = slider("#slide_bed", -1, 6, [1, 3], "Beds: ")
+  sliders['bath'] = slider("#slide_bath", -1, 4, [1, 2], "Baths: ")
+  sliders['price'] = slider("#slide_price", -1, max_price, [min_price, max_price], "Price: ")
   sliders['sqft'] = slider("#slide_sqft", -1, max_sqft, [-1, max_sqft], "SQ.FT.: ")
 
   mapInit('map', 'info', [], 39.50, -98.35, 4)
