@@ -49,6 +49,13 @@ input {
   clear: left;
 }
 
+#searchAgain {
+  font-size: 10pt;  
+}
+.btn {
+  font-size: 8pt;
+}
+
 #btnCopy {
     margin: 0px;
     width: 35px;
@@ -96,15 +103,31 @@ input {
 	height: 180px; 
 }
 #map { 
-    height: 500px;
+    height: 400px;
     width: 80%;
     float: left;
     margin: 0;
 }
+.westOfMap {
+  width: 20%;
+  margin-left: 80%;
+}
+#searchAgain {
+  border-style: solid 1px;
+  padding: 5px;
+  font-family: 'Signika', sans-serif;
+  background-color: #fbb;
+    height: 10%;
+}
+#summary {
+    height: 60%;
+}
+#summary td {
+      font-size: 8pt;
+      text-align: right
+}
 #info {
-    width: 20%;
-    height: 100%;
-    margin-left: 80%;
+    height: 30%;
 }
 
 #tabs {
@@ -147,6 +170,111 @@ input {
 .ui_label {
   font-size: 8pt
 }
+
+
+
+#summary th {
+  color:#D5DDE5;;
+  background:#1b1e24;
+  border-bottom:4px solid #9ea7af;
+  border-right: 1px solid #343a45;
+  font-size:10px;
+  font-weight: 100;
+  padding:2px;
+  text-align:left;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  vertical-align: middle;
+}
+
+#summary th:first-child {
+  border-top-left-radius:3px;
+}
+ 
+#summary th:last-child {
+  border-top-right-radius:3px;
+  border-right:none;
+}
+  
+#summary tr {
+  border-top: 1px solid #C1C3D1;
+  border-bottom-: 1px solid #C1C3D1;
+  color:#666B85;
+  font-size:10px;
+  font-weight:normal;
+  text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
+}
+ 
+#summary tr:hover td {
+  background:#4E5066;
+  color:#FFFFFF;
+  border-top: 1px solid #22262e;
+  border-bottom: 1px solid #22262e;
+}
+ 
+#summary tr:first-child {
+  border-top:none;
+}
+
+#summary tr:last-child {
+  border-bottom:none;
+}
+ 
+#summary tr:nth-child(odd) td {
+  background:#EBEBEB;
+}
+ 
+#summary tr:nth-child(odd):hover td {
+  background:#4E5066;
+}
+
+#summary tr:last-child td:first-child {
+  border-bottom-left-radius:3px;
+}
+ 
+#summary tr:last-child td:last-child {
+  border-bottom-right-radius:3px;
+}
+ 
+#summary td {
+  background:#FFFFFF;
+  padding:2px;
+  text-align:left;
+  vertical-align:middle;
+  font-weight:300;
+  font-size:10px;
+  text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #C1C3D1;
+}
+
+#summary td:last-child {
+  border-right: 0px;
+}
+
+#summary th.text-left {
+  text-align: left;
+}
+
+#summary th.text-center {
+  text-align: center;
+}
+
+#summary th.text-right {
+  text-align: right;
+}
+
+#summary td.text-left {
+  text-align: left;
+}
+
+#summary td.text-center {
+  text-align: center;
+}
+
+#summary td.text-right {
+  text-align: right;
+}
+
+
 
 /*
   Element added or altered, deriving from:

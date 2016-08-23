@@ -19,8 +19,8 @@
     <script src="scripts/map.js"></script>
     <script src="scripts/slider.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.4.1/math.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/lib/OpenLayers.js"></script>
-    <script src="http://maps.googleapis.com/maps/api/js?sensor=true"></script>
   </head>
   <body>
     <div id='outer'>
@@ -58,8 +58,8 @@
             </div>
           </div>
           <div id='search_box'>
-            <span class="ui_label">Address: </span><input id='address' />
-            <button id="btnSearch">Search</button>
+            <span class="ui_label">Location: </span><input id='address' />
+            <button class="btn" id="btnSearch">Search</button>
           </div>
         </div>
         <div id='curlBox'>
@@ -91,7 +91,15 @@
             -->
             <div id='mapContainer'>
               <div id='map'></div>
-              <div id='info'></div>
+              <div>
+                <div class='westOfMap' id='searchAgain'>
+                  Re-search this area?
+                  <button id="btnSearchYes" class="btn">Yes</button>
+                  <button id="btnSearchNo" class="btn">No</button>
+                </div>
+                <div class='westOfMap' id='info'></div>
+                <div class='westOfMap' id='summary'></div>
+              </div>
             </div>
           </div>
           <div id="tabs-2">
