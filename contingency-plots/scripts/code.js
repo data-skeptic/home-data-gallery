@@ -1,7 +1,166 @@
-var baseurl = "http://api.openhouseproject.co"
+var baseurl = "http://api.openhouseproject.co"  // Location of the API
+var save_var_name = "oh-state"                  // Name of variable for local cache
+var map = null                                  // global reference to the map
+var sliders = {}                                // dictionary of all slider UI elements
+var state = {}                                  // Current search filters and other state info
 
-var save_var_name = "oh-state"
+/*
+  This function checks if the visitor has any local storage.
+  If so, it is loaded.  If not, a record is created.
+*/
+function load_state() {
+  var pstate = localStorage.getItem(save_var_name);
+  if (pstate == null) {
+    console.log("Fresh state")
+    state['min_price'] = 100000
+    state['max_price'] = 10000000
+    state['min_sqft']  = 0
+    state['max_sqft']  = 10000
+    state['address']   = ""
+    localStorage.setItem(save_var_name, JSON.stringify(state))
+  }
+  else {
+    console.log("Loading state")
+    state = JSON.parse(pstate)
+  }
+}
 
+/*
+  When the site is doing operations in the background, this function
+  updates the user interface to make it clear we are still waiting.
+*/
+function show_waiting() {
+  $("#errorBox").hide()
+  $("#searchAgain").hide()
+  $(".wait-spinner").show()
+  $(".plotCell").html("<img src='box.gif' />")
+}
+
+/*
+  When the user asks for data to be refreshed, this function is called
+*/
+function doSearch() {
+  show_waiting()
+  request = get_request()
+  murl = update_curl_req(request)
+
+  $.ajax({
+    url: murl,
+    type: 'GET',
+    contentType: 'text/json',
+    dataType: 'json',
+    success: function(resp) {
+      response = resp
+      $(".wait-spinner").hide()
+      updateTable(resp)
+      updateMap(resp['results'])
+      makePlots(resp)
+    },
+    error: function() {
+      console.log('error')
+    }
+  })
+}
+
+/*
+  One UI element reports statistics of listings currently shown on the
+  active viewport of the map.  If the map has been moved, that element
+  needs to be updated, and this initializes a data structure that will
+  store all the statistics.
+*/
+function default_stats() {
+  var zeros = {'min': 0, 'max': 0, 'mean': 0, 'stdev': 0, 'median': 0}
+  return {'beds': zeros, 'baths': zeros, 'price': zeros, 'sqft': zeros}
+}
+
+/*
+  When the page is ready to be loaded, configure everything
+*/
+$(document).ready(function() {
+  load_state()
+
+  var response = null
+  var stats = default_stats()
+
+  // This is the search button that's part of the header
+  $("#btnSearch").click(doSearch)
+
+  // This is the button that is shown when the user moves the map and is asked if
+  // they want to update
+  $("#btnSearchYes").click(function() {
+    var bounds = map.getExtent().clone()
+    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
+    clon = (bbox.top - bbox.bottom)/2 + bbox.bottom
+    clat = (bbox.left - bbox.right)/2 + bbox.right
+
+    var lat2 = bbox.left
+    var lon2 = bbox.top
+
+    miles = haversine_distance(clat, clon, lat2, lon2)
+
+    searchBounds = "(" + Math.round(miles) + "," + clon.toFixed(3) + "," + clat.toFixed(3) + ")"
+    $("#address").val(searchBounds)
+    doSearch()
+  })
+
+  // Remove UI element if user wants to hid it
+  $("#btnSearchNo").click(function() {
+    $("#searchAgain").hide()
+  })
+
+  // Initialize the sliders in the header
+  sliders['bed'] = slider("#slide_bed", -1, 6, [1, 3], "Beds: ")
+  sliders['bath'] = slider("#slide_bath", -1, 4, [1, 2], "Baths: ")
+  sliders['price'] = slider("#slide_price", -1, state['max_price'], [state['min_price'], state['max_price']], "Price: ")
+  sliders['sqft'] = slider("#slide_sqft", -1, state['max_sqft'], [state['min_sqft'], state['max_sqft']], "SQ.FT.: ")
+
+  $("#address").val(state['address'])
+
+  /*
+    Configure the map
+  */
+  ev = {
+      eventListeners: {
+          "moveend": mapEvent,
+          "zoomend": mapEvent,
+          "changelayer": mapLayerChanged,
+          "changebaselayer": mapBaseLayerChanged
+      }
+    }  
+  map = mapInit('map', 'info', [], 39.50, -98.35, 4, ev)
+
+  // Don't show this box until the map is moved
+  $("#searchAgain").hide()
+
+  // Configure clipboard interactions for the curl->clipboard box
+  new Clipboard('#btnCopy');
+
+  // Configure tabs
+  $("#tabs").tabs({
+      activate: function (event, ui) {
+          var active = $('#tabs').tabs('option', 'active');
+      }
+  });
+
+  // Configure an update when any slider is changed
+  $.each(sliders, function(i, slider) {
+    slider.noUiSlider.on('update', function( values, handle ) {
+      update_curl_req(get_request())
+    })
+  })
+
+  // Configure an update when the address box is changed
+  $("#address").change(function() {
+    update_curl_req(get_request())
+  })
+
+  // Do initial search
+  doSearch()
+});
+
+/*
+  Checks to see if the text in the #address box consists of the formal for a radius search
+*/
 function isRadius(s) {
   if (s.split(",").length!=3) return false;
   if (s.substring(0,1)!="(") return false;
@@ -9,11 +168,10 @@ function isRadius(s) {
   return true;
 }
 
-function default_stats() {
-  var zeros = {'min': 0, 'max': 0, 'mean': 0, 'stdev': 0, 'median': 0}
-  return {'beds': zeros, 'baths': zeros, 'price': zeros, 'sqft': zeros}
-}
-
+/*
+  Accept an array of properties visible in the map's viewport
+  Return summary statistics of those properties
+*/
 function get_stats(arr) {
   var stats = {
       'min': math.min(arr)
@@ -25,6 +183,9 @@ function get_stats(arr) {
   return stats
 }
 
+/*
+  Generate a request object based on all the UI filters
+*/
 function get_request() {
   svals = sliders['price'].noUiSlider.get()
   state['min_price'] = parseFloat(svals[0])
@@ -61,6 +222,11 @@ function get_request() {
   return request
 }
 
+/*
+  Given a request object, convert it into a corresponding CURL request.  This
+  request is not used, but is provided to the user in the UI in case they'd like
+  a handy way to grab the data shown.
+*/
 function update_curl_req(request) {
   var murl = baseurl + '/api/property/?'
   var keys = Object.keys(request)
@@ -77,28 +243,9 @@ function update_curl_req(request) {
   return murl
 }
 
-function render() {
-  request = get_request()
-  murl = update_curl_req(request)
-
-  $.ajax({
-  	url: murl,
-  	type: 'GET',
-  	contentType: 'text/json',
-  	dataType: 'json',
-  	success: function(resp) {
-      response = resp
-      $(".wait-spinner").hide()
-      updateTable(resp)
-      updateMap(resp['results'])
-      makePlots(resp)
-  	},
-  	error: function() {
-  		console.log('error')
-  	}
-  })
-}
-
+/*
+  Populate the "Analysis" tab, which has a scatter matrix of values
+*/
 function makePlots(resp) {
   data = resp['results']
   var dims = ['price', 'bathrooms', 'bedrooms', 'building_size']
@@ -128,6 +275,9 @@ function makePlots(resp) {
   }
 }
 
+/*
+  Given new data from the server, update the map
+*/
 function updateMap(data) {
     remove_all_markers()
     stats = default_stats()
@@ -191,10 +341,14 @@ function updateMap(data) {
     update_summary('summary')
 }
 
+// Helper function
 function formatNumber(n) {
   return Math.round(n * 100)/100
 }
 
+/*
+  Render the summary box to the right of the map
+*/
 function update_summary(container) {
   var bdy = `
     <table>
@@ -224,6 +378,10 @@ function update_summary(container) {
   $("#" + container).html(bdy)
 }
 
+/*
+  Helper function that makes it easier to take the API's response and format it
+  conveniently for the D3 visualizations to use
+*/
 function extractData(data, var1, var2) {
 	var pdata = {x: [], y: []}
 	for (var d in data) {
@@ -240,6 +398,10 @@ function extractData(data, var1, var2) {
 	return pdata
 }
 
+/*
+  A helper function thate takes the data returned from the API and aggregates it
+  for use in the "Analysis" tab visualizations
+*/
 function aggregateData(data, var1, var2) {
   counter = {}
   $.each(data, function(i, elem) {
@@ -268,35 +430,9 @@ function aggregateData(data, var1, var2) {
   return agg
 }
 
-function showWaiting() {
-  $("#errorBox").hide()
-  $("#searchAgain").hide()
-  $(".wait-spinner").show()
-	$(".plotCell").html("<img src='box.gif' />")
-}
-
-function load_state() {
-  var pstate = localStorage.getItem(save_var_name);
-  if (pstate == null) {
-    console.log("Fresh state")
-    state['min_price'] = 100000
-    state['max_price'] = 10000000
-    state['min_sqft']  = 0
-    state['max_sqft']  = 10000
-    state['address']   = ""
-    localStorage.setItem(save_var_name, JSON.stringify(state))
-  }
-  else {
-    console.log("Loading state")
-    state = JSON.parse(pstate)
-  }
-}
-
-
-var map = null
-var sliders = {}
-var state = {}
-
+/*
+  A helper function that checks if val is beteen bound1 and bound2
+*/
 function between(val, bound1, bound2) {
   if (bound2 < bound1) {
     swap = bound1
@@ -311,6 +447,9 @@ function between(val, bound1, bound2) {
   return false
 }
 
+/*
+  Determine if the map should be updated
+*/
 function considerMapUpdate() {
   $("#searchAgain").show()
   var inbounds = []
@@ -331,14 +470,22 @@ function considerMapUpdate() {
   }
 }
 
+/*
+  Call this function when an map event has occured
+*/
 function mapEvent(event) {
   et = event.type
   if (et=="zoomend" || et=="moveend") {
     considerMapUpdate()
   } else {
-    console.log(event.type)    
+    // Perhaps in the future we will handle other events too
   }
 }
+
+/*
+  These next two function are not used.  They are added to cover events
+  we might want to respond to in the future.
+*/
 function mapBaseLayerChanged(event) {
   console.log(event.type + " " + event.layer.name);
 }
@@ -346,74 +493,6 @@ function mapLayerChanged(event) {
   console.log(event.type + " " + event.layer.name + " " + event.property);
 }
 
-function doSearch() {
-  showWaiting()
-  render()
-}
 
-$( document ).ready(function() {
-  load_state()
-
-  var response = null
-  var stats = default_stats()
-
-  $("#btnSearch").click(doSearch)
-  $("#btnSearchYes").click(function() {
-    var bounds = map.getExtent().clone()
-    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
-    clon = (bbox.top - bbox.bottom)/2 + bbox.bottom
-    clat = (bbox.left - bbox.right)/2 + bbox.right
-
-    var lat2 = bbox.left
-    var lon2 = bbox.top
-
-    miles = haversine_distance(clat, clon, lat2, lon2)
-
-    searchBounds = "(" + Math.round(miles) + "," + clon.toFixed(3) + "," + clat.toFixed(3) + ")"
-    $("#address").val(searchBounds)
-    doSearch()
-  })
-  $("#btnSearchNo").click(function() {
-    $("#searchAgain").hide()
-  })
-
-  sliders['bed'] = slider("#slide_bed", -1, 6, [1, 3], "Beds: ")
-  sliders['bath'] = slider("#slide_bath", -1, 4, [1, 2], "Baths: ")
-  sliders['price'] = slider("#slide_price", -1, state['max_price'], [state['min_price'], state['max_price']], "Price: ")
-  sliders['sqft'] = slider("#slide_sqft", -1, state['max_sqft'], [state['min_sqft'], state['max_sqft']], "SQ.FT.: ")
-
-  $("#address").val(state['address'])
-
-  ev = {
-      eventListeners: {
-          "moveend": mapEvent,
-          "zoomend": mapEvent,
-          "changelayer": mapLayerChanged,
-          "changebaselayer": mapBaseLayerChanged
-      }
-    }
-  
-  map = mapInit('map', 'info', [], 39.50, -98.35, 4, ev)
-
-  $("#searchAgain").hide()
-
-  new Clipboard('#btnCopy');
-
-	showWaiting()
-	render()
-  $("#tabs").tabs({
-      activate: function (event, ui) {
-          var active = $('#tabs').tabs('option', 'active');
-      }
-  });
-  $.each(sliders, function(i, slider) {
-    slider.noUiSlider.on('update', function( values, handle ) {
-      update_curl_req(get_request())
-    })
-  })
-  $("#address").change(function() {
-    update_curl_req(get_request())
-  })
-});
 
 
