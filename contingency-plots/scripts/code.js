@@ -115,6 +115,7 @@ $(document).ready(function() {
   sliders['sqft'] = slider("#slide_sqft", -1, state['max_sqft'], [state['min_sqft'], state['max_sqft']], "SQ.FT.: ")
 
   $("#address").val(state['address'])
+  $("#location_div").hide()
 
   /*
     Configure the map
