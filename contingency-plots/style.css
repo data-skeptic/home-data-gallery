@@ -155,7 +155,15 @@ input {
 }
 
 #selector_right {
-  margin-left: 240px;
+  float: left;
+}
+
+#search_box {
+	margin-left: 480px;
+}
+
+#btnSearch {
+	padding: 10px;
 }
 
 .slider_label {
