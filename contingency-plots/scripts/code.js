@@ -53,7 +53,7 @@ function doSearch() {
     success: function(resp) {
       response = resp
       $(".wait-spinner").hide()
-      updateTable(resp)
+      updateTable(resp) // updateTable.js
       updateMap(resp['results'])
       makePlots(resp)
       writeLocalStorage(resp) // localStorageIO.js
