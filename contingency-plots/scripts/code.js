@@ -238,6 +238,7 @@ function update_curl_req(request) {
     }
     murl += item + "=" + request[item]
     console.log("saving state")
+    // This save the request URL??
     localStorage.setItem(save_var_name, JSON.stringify(state))
   }
   $("#curl").val('curl -X GET "' + murl + '"')
