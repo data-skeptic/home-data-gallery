@@ -15,7 +15,7 @@ function updateTable(resp) {
       rows += "<td>" + elem['bedrooms'] + "</td>"
       rows += "<td>" + elem['bathrooms'] + "</td>"
       rows += "<td>" + elem['building_size'] + "</td>"
-      rows += "<td>" + elem['var_spaces'] + "</td>"
+      rows += "<td>" + elem['car_spaces'] + "</td>"
       rows += "<td>" + elem['listing_type'] + "</td>"
       rows += "<td>" + elem['price'] + "</td>"
       rows += "<td>" + elem['size_units'] + "</td>"
