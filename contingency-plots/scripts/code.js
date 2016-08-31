@@ -56,7 +56,7 @@ function doSearch() {
       updateTable(resp)
       updateMap(resp['results'])
       makePlots(resp)
-      writeLocalStorage(resp)
+      writeLocalStorage(resp) // localStorageIO.js
     },
     error: function() {
       console.log('error')

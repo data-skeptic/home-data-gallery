@@ -1,3 +1,5 @@
+// call by doSearch() in code.js
+// Need unit test
 function writeLocalStorage(data) {
   toCache = {}
   console.log(data.length)
@@ -17,22 +19,12 @@ function writeLocalStorage(data) {
       toCache['size_units'] = toCache['size_units']
       toCache['latitude'] = elem['address_object']['latitude']
       toCache['longitude'] = elem['address_object']['longitude']
+      // Save data elemenet to cache by element id
       localStorage.setItem(elem['id'], JSON.stringify(toCache))
     })
   }
 }
 
-$.ajax
-  url: murl,
-    type: 'GET',
-    contentType: 'text/json',
-    dataType: 'json',
-    success: function(resp) {
-      console.log("success ajax")
-      console.log(resp.length)
-      writeLocalStorage(resp['results'])
-    },
-    error: function() {
-      console.log('error')
-    }
-  })
+// function readLocalStorage(id) {
+// hold for now  
+// }
