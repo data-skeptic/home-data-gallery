@@ -34,7 +34,7 @@ function scatterplot(container, xy, w, h) {
   .scale(x)
   .orient('bottom');
 
-  xAxis.ticks(2)
+  xAxis.ticks(4)
 
   main.append('g')
   .attr('transform', 'translate(0,' + height + ')')
