@@ -17,6 +17,7 @@ function load_state() {
     state['min_sqft']  = 0
     state['max_sqft']  = 10000
     state['address']   = ""
+    // save search criteria? not data?
     localStorage.setItem(save_var_name, JSON.stringify(state))
   }
   else {
