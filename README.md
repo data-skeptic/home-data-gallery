@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/data-skeptic/home-data-gallery.png?label=ready&title=Ready)](https://waffle.io/data-skeptic/home-data-gallery)
 # Data Skeptic, Home Data Gallery
 ### Examples uses of the home data and data api.
 #### Goal: Help people get started working on there own projects or just cool stuff. 
