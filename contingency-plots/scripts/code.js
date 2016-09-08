@@ -17,6 +17,7 @@ function load_state() {
     state['min_sqft']  = 0
     state['max_sqft']  = 10000
     state['address']   = ""
+    // save search criteria? not data?
     localStorage.setItem(save_var_name, JSON.stringify(state))
   }
   else {
@@ -52,15 +53,17 @@ function doSearch() {
     success: function(resp) {
       response = resp
       $(".wait-spinner").hide()
-      updateTable(resp)
+      updateTable(resp) // updateTable.js
       updateMap(resp['results'])
       makePlots(resp)
+      writeLocalStorage(resp) // localStorageIO.js
     },
     error: function() {
       console.log('error')
     }
   })
 }
+
 
 /*
   One UI element reports statistics of listings currently shown on the
@@ -238,6 +241,7 @@ function update_curl_req(request) {
     }
     murl += item + "=" + request[item]
     console.log("saving state")
+    // This save the request URL??
     localStorage.setItem(save_var_name, JSON.stringify(state))
   }
   $("#curl").val('curl -X GET "' + murl + '"')
