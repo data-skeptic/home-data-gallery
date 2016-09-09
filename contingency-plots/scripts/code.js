@@ -175,8 +175,6 @@ $(document).ready(function() {
   })
   updateMap(results)
 
-
-
   // Do initial search
   doSearch()
 });
