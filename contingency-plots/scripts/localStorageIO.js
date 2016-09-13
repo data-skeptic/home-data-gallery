@@ -43,34 +43,50 @@ $.each(keys, function(i, key) {
   }
 })
 
+var er = null
+
 // call by doSearch() in code.js
 function writeLocalStorage(response) {
   data = response['results']
   if (data.length > 0) {
     $.each(data, function(i, elem) {
-      var toCache = {}
-      toCache['id'] = elem['id']
-      toCache['address_object'] = elem['address_object']
-      toCache['bedrooms'] = elem['bedrooms']
-      toCache['bathrooms'] = elem['bathrooms']
-      toCache['building_size'] = elem['building_size']
-      toCache['car_spaces'] = elem['car_spaces']
-      toCache['listing_type'] = elem['listing_type']
-      toCache['price'] = elem['price']
-      toCache['size_units'] = elem['size_units']
-      toCache['latitude'] = elem['address_object']['latitude']
-      toCache['longitude'] = elem['address_object']['longitude']
-      // Save data elemenet to cache by element id
-      localStorage.setItem(elem['id'], JSON.stringify(toCache))
-      point = {"latitude": toCache['latitude'], "longitude": toCache['longitude']}
-      dupes = tree.nearest(point, 9999, 1)
-      $.each(dupes, function(i, dwrap) {
-        dupe = dwrap[0]
-        if (dupe['id'] == elem['id']) {
-          tree.remove(dupe)
+      if (elem['address_object'] != undefined) {
+        var toCache = {}
+        toCache['id'] = elem['id']
+        toCache['address_object'] = elem['address_object']
+        toCache['bedrooms'] = elem['bedrooms']
+        toCache['bathrooms'] = elem['bathrooms']
+        toCache['building_size'] = elem['building_size']
+        toCache['car_spaces'] = elem['car_spaces']
+        toCache['listing_type'] = elem['listing_type']
+        toCache['price'] = elem['price']
+        toCache['size_units'] = elem['size_units']
+        toCache['latitude'] = elem['address_object']['latitude']
+        toCache['longitude'] = elem['address_object']['longitude']
+
+        // Save data element to cache by element id
+        point = {"latitude": toCache['latitude'], "longitude": toCache['longitude']}
+        dupes = tree.nearest(point, 9999, 1)
+        $.each(dupes, function(i, dwrap) {
+          dupe = dwrap[0]
+          if (dupe['id'] == elem['id']) {
+            tree.remove(dupe)
+          }
+        })
+        tree.insert(toCache)
+
+        // Save element to `localStore` to be more persistent
+        try {
+          localStorage.setItem(elem['id'], JSON.stringify(toCache))
+        } catch (err) {
+          if (err.name == "QuotaExceededError") {
+            //console.log("Quota issue")
+            // TODO: handle it better
+          } else {
+            console.log(err)
+          }
         }
-      })
-      tree.insert(toCache)
+      }
     })
   }
 }
@@ -90,20 +106,76 @@ function clearLocalStorage() {
   localStorage.clear()
 }
 
-function readPropertiesFromLocalStorage(lat, lng, radius, filters) {
+function isInside(lat, lon, bbox) {
+  if (lat == null || lon == null) {
+    return false
+  }
+  var lat1 = bbox.top
+  var lon1 = bbox.left
+  var lat2 = bbox.bottom
+  var lon2 = bbox.right
+  if (lat2 <= lat && lat <= lat1) {
+    if (lon1 <= lon && lon <= lon2) {
+      return true
+    }
+  }
+  return false
+}
+
+function readPropertiesFromLocalStorage(viewport, filters) {
+  var lat1 = bbox.top
+  var lon1 = bbox.left
+  var lat2 = bbox.bottom
+  var lon2 = bbox.right
+  var clat = (lat1 - lat2)/2 + lat2
+  var clon = (lon1 - lon2)/2 + lon2
+
+  radius_miles = haversine_distance(clat, clon, lat2, lon2)
   // TODO: revisit this 9999
-  cmatches = tree.nearest({"latitude": lat, "longitude": lng}, 9999, radius)
+  kdmatches = tree.nearest({"latitude": clat, "longitude": clon}, 9999, radius_miles)
+
+  cmatches = []
+  $.each(kdmatches, function(i, match) {
+    match = match[0] // trim off distance value
+    // Trim radius result down to viewport
+    if (isInside(match['latitude'], match['longitude'], bbox)) {
+      cmatches.push(match)
+    }
+  })
+
   matches = []
   filterAttributes = Object.keys(filters)
   $.each(cmatches, function(i, cmatch) {
     var filterMatch = true
-    $.each(filterAttributes, function(i, key) {
-      val = cmatch[0][key]
-      if (val == undefined) {
-        filterMatch = false
+    $.each(filterAttributes, function(i, kkey) {
+      var valid_key = true
+      var min = true
+      if (kkey.startsWith('min_')) {
+        key = kkey.substring(4, kkey.length)
       }
-      else if (val != filters[key]) {
-        filterMatch = false
+      else if (kkey.startsWith('max_')) {
+        key = kkey.substring(4, kkey.length)
+        min = false
+      }
+      else {
+        valid_key = false
+      }
+      if (valid_key) {
+        val = cmatch[key]
+        if (val == undefined) {
+          filterMatch = false
+        }
+        else {
+          if (min) {
+            if (val < filters[kkey]) {
+              filterMatch = false
+            }
+          } else {
+            if (val > filters[kkey]) {
+              filterMatch = false
+            }
+          }
+        }        
       }
     })
     if (filterMatch) {
@@ -111,12 +183,6 @@ function readPropertiesFromLocalStorage(lat, lng, radius, filters) {
     }
   })
   return matches
-}
-
-// get data through API
-function callREST() {
-  var request = get_request()
-  return $.ajax({url: update_curl_req(request)})
 }
 
 // not TESTed

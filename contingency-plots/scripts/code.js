@@ -4,6 +4,8 @@ var map = null                                  // global reference to the map
 var sliders = {}                                // dictionary of all slider UI elements
 var state = {}                                  // Current search filters and other state info
 
+var api = ApiConnectorSingleton.getInstance()
+
 /*
   This function checks if the visitor has any local storage.
   If so, it is loaded.  If not, a record is created.
@@ -12,18 +14,42 @@ function load_state() {
   var pstate = localStorage.getItem(save_var_name);
   if (pstate == null) {
     console.log("Fresh state")
-    state['min_price'] = 100000
-    state['max_price'] = 10000000
-    state['min_sqft']  = 0
-    state['max_sqft']  = 10000
-    state['address']   = ""
-    // save search criteria? not data?
-    localStorage.setItem(save_var_name, JSON.stringify(state))
+    state['min_price']        = 100000
+    state['max_price']        = 10000000
+    state['min_sqft']         = 0
+    state['max_sqft']         = 10000
+    state['address']          = ""
+    state['map']              = {}
+    state['map']['zoom']      = 4
+    state['map']['latitude']  = 39.50
+    state['map']['longitude'] = -98.35
+    save_state()
   }
   else {
     console.log("Loading state")
     state = JSON.parse(pstate)
+    if (state['map'] == undefined) {
+      state['map']              = {}
+      state['map']['zoom']      = 4
+      state['map']['latitude']  = 39.50
+      state['map']['longitude'] = -98.35      
+    }
+    // Check for missing values (could happen if someone has a state from an earlier version)
+    // Set intelligent defaults for any missing values
+    if (state['min_price'] == undefined) state['min_price'] = 100000
+    if (state['max_price'] == undefined) state['max_price'] = 10000000
+    if (state['min_sqft'] == undefined) state['min_sqft'] = 0
+    if (state['max_sqft'] == undefined) state['max_sqft'] = 10000
+    if (state['address'] == undefined) state['address'] = ""
+    // TODO: set filter defaults from state (sliders)
   }
+}
+
+/*
+  Whenever any change to the state is made, this is called to save it
+*/
+function save_state() {
+    localStorage.setItem(save_var_name, JSON.stringify(state))
 }
 
 /*
@@ -32,7 +58,6 @@ function load_state() {
 */
 function show_waiting() {
   $("#errorBox").hide()
-  $("#searchAgain").hide()
   $(".wait-spinner").show()
   $(".plotCell").html("<img src='box.gif' />")
 }
@@ -43,25 +68,9 @@ function show_waiting() {
 function doSearch() {
   show_waiting()
   request = get_request()
+  api.setRequest(request)
   murl = update_curl_req(request)
-
-  $.ajax({
-    url: murl,
-    type: 'GET',
-    contentType: 'text/json',
-    dataType: 'json',
-    success: function(resp) {
-      response = resp
-      $(".wait-spinner").hide()
-      updateTable(resp) // updateTable.js
-      updateMap(resp['results'])
-      makePlots(resp)
-      writeLocalStorage(resp) // localStorageIO.js
-    },
-    error: function() {
-      console.log('error')
-    }
-  })
+  api.callApi()
 }
 
 
@@ -76,19 +85,6 @@ function default_stats() {
   return {'beds': zeros, 'baths': zeros, 'price': zeros, 'sqft': zeros}
 }
 
-function getSearchBounds() {
-    var bounds = map.getExtent().clone()
-    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
-    clat = (bbox.top - bbox.bottom)/2 + bbox.bottom
-    clon = (bbox.left - bbox.right)/2 + bbox.right
-
-    var lat2 = bbox.left
-    var lon2 = bbox.top
-
-    miles = haversine_distance(clat, clon, lat2, lon2)
-    return {"miles": miles, "lon": clon, "lat": clat}
-}
-
 /*
   When the page is ready to be loaded, configure everything
 */
@@ -100,20 +96,6 @@ $(document).ready(function() {
 
   // This is the search button that's part of the header
   $("#btnSearch").click(doSearch)
-
-  // This is the button that is shown when the user moves the map and is asked if
-  // they want to update
-  $("#btnSearchYes").click(function() {
-    sb = getSearchBounds()
-    searchBoundsStr = "(" + Math.round(sb['miles']) + "," + sb['lon'].toFixed(3) + "," + sb['lat'].toFixed(3) + ")"
-    $("#address").val(searchBoundsStr)
-    doSearch()
-  })
-
-  // Remove UI element if user wants to hid it
-  $("#btnSearchNo").click(function() {
-    $("#searchAgain").hide()
-  })
 
   // Initialize the sliders in the header
   sliders['bed'] = slider("#slide_bed", -1, 6, [1, 3], "Beds: ")
@@ -135,10 +117,7 @@ $(document).ready(function() {
           "changebaselayer": mapBaseLayerChanged
       }
     }  
-  map = mapInit('map', 'info', [], 39.50, -98.35, 4, ev)
-
-  // Don't show this box until the map is moved
-  $("#searchAgain").hide()
+  map = mapInit('map', 'info', [], state['map']['latitude'], state['map']['longitude'], state['map']['zoom'], ev)
 
   // Configure clipboard interactions for the curl->clipboard box
   new Clipboard('#btnCopy');
@@ -153,27 +132,31 @@ $(document).ready(function() {
   // Configure an update when any slider is changed
   $.each(sliders, function(i, slider) {
     slider.noUiSlider.on('update', function( values, handle ) {
-      update_curl_req(get_request())
+      $(".wait-spinner").show()
+      request = get_request()
+      api.setRequest(request)
+      update_curl_req(request)
     })
   })
 
   // Configure an update when the address box is changed
   $("#address").change(function() {
-    update_curl_req(get_request())
+      request = get_request()
+      api.setRequest(request)
+      update_curl_req(request)
   })
 
-  sb = getSearchBounds()
-  lat = sb['lat']
-  lng = sb['lon']
-  radius = sb['miles']
-  // TODO: get the filters
-  filters = {}
-  wresults = readPropertiesFromLocalStorage(lat, lng, radius, filters)
-  results = []
-  $.each(wresults, function(i, result) {
-    results.push(result[0])
-  })
+  request = get_request()
+  api.setFilters(request)
+  setInterval(function() {api.callApi()}, 1000)
+
+  var bounds = map.getExtent().clone()
+  bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
+  filters = get_request()
+  results = readPropertiesFromLocalStorage(bbox, filters)
   updateMap(results)
+  updateTable(results) // updateTable.js
+  makePlots(results)
 
   // Do initial search
   doSearch()
@@ -221,8 +204,6 @@ function get_request() {
   state['min_sqft'] = parseFloat(svals[0])
   state['max_sqft'] = parseFloat(svals[1])
   svals = sliders['price'].noUiSlider.get()
-  address = $("#address").val()
-  address = address.trim()
 
   request = {'min_price': state['min_price'],
       'max_price': state['max_price'],
@@ -231,15 +212,9 @@ function get_request() {
       'min_bathrooms': state['min_baths'],
       'max_bathrooms': state['max_baths'],
       'min_building_size': state['min_sqft'],
-      'max_building_size': state['max_sqft'],
-      'limit': '500',
-      'offset': '0'
+      'max_building_size': state['max_sqft']
   }
-  if (isRadius(address)) {
-    request['close_to'] = address
-  } else {
-    request['address'] = address
-  }
+
   return request
 }
 
@@ -259,7 +234,7 @@ function update_curl_req(request) {
     murl += item + "=" + request[item]
     console.log("saving state")
     // This save the request URL??
-    localStorage.setItem(save_var_name, JSON.stringify(state))
+    save_state()
   }
   $("#curl").val('curl -X GET "' + murl + '"')
   return murl
@@ -268,26 +243,26 @@ function update_curl_req(request) {
 /*
   Populate the "Analysis" tab, which has a scatter matrix of values
 */
-function makePlots(resp) {
-  data = resp['results']
+function makePlots(homes) {
   var dims = ['price', 'bathrooms', 'bedrooms', 'building_size']
   var cells = ['Price', 'Beds', 'Baths', 'Sqft']
-  if (data['count'] == 0) {
+  if (homes.length == 0) {
     $(".plotCell").html("")
     $("#errorBox").html("Your search result did not return any properties.")
     $("#errorBox").show()
   }
   else {
+    $("#errorBox").hide()
     var w = 200
     var h = 200
     for (var r=0; r < dims.length; r++) {
       for (var c=r; c < dims.length; c++) {
         var container = cells[r] + 'V' + cells[c]
-        xy = extractData(data, dims[r], dims[c])
+        xy = extractData(homes, dims[r], dims[c])
         if (r==c) {
           histogram("#" + container, xy['x'], w, h)
         } else if (dims[r] == 'bathrooms' && dims[c] == 'bedrooms' || dims[c] == 'bathrooms' && dims[r] == 'bedrooms') {
-          agg = aggregateData(data, dims[r], dims[c])
+          agg = aggregateData(homes, dims[r], dims[c])
           heatmap("#" + container, agg)
         } else {
           scatterplot('#' + container, xy, w, h)
@@ -298,12 +273,37 @@ function makePlots(resp) {
 }
 
 /*
-  Given new data from the server, update the map
+  Helper function that makes it easier to take the API's response and format it
+  conveniently for the D3 visualizations to use
+*/
+function extractData(homes, var1, var2) {
+  var pdata = {x: [], y: []}
+  for (var d in homes) {
+    var property = homes[d]
+    if (property != null) {
+      x = property[var1]
+      y = property[var2]
+      if (x != undefined && y != undefined) {
+        pdata['x'].push(x)
+        pdata['y'].push(y)        
+      }
+    }
+  }
+  return pdata
+}
+
+/*
+  Given a list of properties (data), update the map and 
+  apply filters such as minimum number of bedrooms
 */
 function updateMap(data) {
+    var bounds = map.getExtent().clone()
+    var bounds = map.getExtent().clone()
+    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
+    filters = get_request()
+    data = readPropertiesFromLocalStorage(bbox, filters)
     remove_all_markers()
     stats = default_stats()
-
     if (data.length > 0) {
       beds = []
       baths = []
@@ -317,30 +317,39 @@ function updateMap(data) {
         var bath = elem['bathrooms']
         var price = elem['price']
         var sqft = elem['building_size']
+        var lat = 0
+        var lon = 0
         if (ao != null) {
-          property = {
-            "address": ao['formatted_address'],
-            "sale_price": price,
-            "bedrooms": bed,
-            "bathrooms": bath,
-            "latitude": ao['latitude'],
-            "longitude": ao['longitude']
-          }
-          add_marker(property)
-          if (bed >= 0) {
-            beds.push(bed)
-          }
-          if (bath >= 0) {
-            baths.push(bath)
-          }
-          if (price >= 0) {
-            prices.push(price)
-          }
-          if (sqft >= 0) {
-            sqfts.push(sqft)
-          }
+          address = ao['formatted_address']
+          lat = ao['latitude']
+          lon = ao['longitude']
+        } else if (elem['latitude'] != undefined) {
+          lat = elem['latitude']
+          lon = elem['longitude']
         } else {
           error_count += 1
+        }
+        property = {
+          "address": address,
+          "sale_price": price,
+          "bedrooms": bed,
+          "bathrooms": bath,
+          "latitude": lat,
+          "longitude": lon
+        }
+        add_marker(property)
+
+        if (bed >= 0) {
+          beds.push(bed)
+        }
+        if (bath >= 0) {
+          baths.push(bath)
+        }
+        if (price >= 0) {
+          prices.push(price)
+        }
+        if (sqft >= 0) {
+          sqfts.push(sqft)
         }
       })
       if (beds.length > 0) {
@@ -355,7 +364,9 @@ function updateMap(data) {
       if (sqfts.length > 0) {
         stats['sqft'] = get_stats(sqfts)
       }
-      console.log("There were " + error_count + " listings missing `address_object`")
+      if (error_count > 0) {
+        console.log("There were " + error_count + " listings missing `address_object`")
+      }
     }
     else {
       console.log("No listings to update")
@@ -398,26 +409,6 @@ function update_summary(container) {
     </table>
   `
   $("#" + container).html(bdy)
-}
-
-/*
-  Helper function that makes it easier to take the API's response and format it
-  conveniently for the D3 visualizations to use
-*/
-function extractData(data, var1, var2) {
-	var pdata = {x: [], y: []}
-	for (var d in data) {
-		var property = data[d]
-    if (property != null) {
-  		x = property[var1]
-  		y = property[var2]
-      if (x != undefined && y != undefined) {
-        pdata['x'].push(x)
-        pdata['y'].push(y)        
-      }
-    }
-	}
-	return pdata
 }
 
 /*
@@ -472,24 +463,37 @@ function between(val, bound1, bound2) {
 /*
   Determine if the map should be updated
 */
-function considerMapUpdate() {
-  $("#searchAgain").show()
-  var inbounds = []
-  if (window['response'] != undefined) {
-    var bounds = map.getExtent().clone()
-    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
-    $.each(response['results'], function(i, result) {
-      ao = result['address_object']
-      if (ao != undefined) {
-        if (between(ao['latitude'], bbox.bottom, bbox.top)) {
-          if (between(ao['longitude'], bbox.left, bbox.right)) {
-            inbounds.push(result)
-          }
-        }
-      }
-    })
-    updateMap(inbounds)
-  }
+function updateMapAfterViewportChange() {
+  start = new Date().getTime()
+  var bounds = map.getExtent().clone()
+  bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
+
+  lat = map.getCenter()['lat']
+  lon = map.getCenter()['lon']
+  var mapnik         = new OpenLayers.Layer.OSM();
+  var toProjection   = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
+  var fromProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+  var position       = new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection)
+  state['map']              = {}
+  state['map']['zoom']      = map.getZoom()
+  state['map']['latitude']  = position['lat']
+  state['map']['longitude'] = position['lon']
+  save_state()
+
+  var bounds = map.getExtent().clone()
+  bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
+  filters = get_request()
+  results = readPropertiesFromLocalStorage(bbox, filters)
+  updateMap(results)
+  updateTable(results) // updateTable.js
+  makePlots(results)
+
+  request = get_request()
+  api.setRequest(request)
+  update_curl_req(request)
+  save_state()
+  end = new Date().getTime()
+  console.log('updateMapAfterViewportChange took' + (end - start).toString())
 }
 
 /*
@@ -498,7 +502,8 @@ function considerMapUpdate() {
 function mapEvent(event) {
   et = event.type
   if (et=="zoomend" || et=="moveend") {
-    considerMapUpdate()
+    $(".wait-spinner").show()
+    updateMapAfterViewportChange()
   } else {
     // Perhaps in the future we will handle other events too
   }
