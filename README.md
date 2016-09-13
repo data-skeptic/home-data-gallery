@@ -1,11 +1,9 @@
 [![Stories in Ready](https://badge.waffle.io/data-skeptic/home-data-gallery.png?label=ready&title=Ready)](https://waffle.io/data-skeptic/home-data-gallery)
-# Data Skeptic, Home Data Gallery
-### Examples uses of the home data and data api.
-#### Goal: Help people get started working on there own projects or just cool stuff. 
+# OpenHouse Interactive Tool
+This repo is a Javascript based web front end that gets data from the OpenHouse API and allows users to interact with it via map, search filters, visualizations, and data dumps.
 
-### Examples:
-* Mapping
-* Scaping data
+### Examples found in code:
+* Mapping witg OSM
 * Using the data api
 * Statitics
 * Pulling in other data sources
@@ -13,12 +11,5 @@
 
 #### How to get involed:
 * Make a pull request.
-* Would you like to see an example of something, great and issue and lable it "Wish List".
-* Need help with an example, create and issue and lable it "Need Help"
-* [Join the team](https://dataskeptic.slack.com)
-
-
-It is encourged that examples use Jupyter (ipython) notebooks.
-
-#### Other usefull projects.
-* [Urban Data Science](https://github.com/gboeing/urban-data-science)
+* Check out our [Waffle page](https://waffle.io/data-skeptic/home-data-gallery) of open tasks.
+* [Join the team](https://dataskeptic.slack.com).
