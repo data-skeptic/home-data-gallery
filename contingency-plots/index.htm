@@ -11,7 +11,19 @@
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
-    <script src="code.js"></script>
+    <script src="scripts/ApiConnectorSingleton.js"></script>
+    <script src="scripts/code.js"></script>
+    <script src="scripts/heatmap.js"></script>
+    <script src="scripts/scatterplot.js"></script>
+    <script src="scripts/histogram.js"></script>
+    <script src="scripts/updateTable.js"></script>
+    <script src="scripts/map.js"></script>
+    <script src="scripts/slider.js"></script>
+    <script src="scripts/kdTree-min.js"></script>
+    <script src="scripts/localStorageIO.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.4.1/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/lib/OpenLayers.js"></script>
   </head>
   <body>
     <div id='outer'>
@@ -20,74 +32,72 @@
           <img src='http://dataskeptic.com/home-sales/dshs.png' id='logo' />
         </div>
         <div id='selectors'>
-          Beds:
-          <select id='min_beds'>
-            <option value='-1'>-1</option>
-            <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6'>6</option>
-          </select>
-          -
-          <select id='max_beds'>
-            <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6' selected>6</option>
-          </select>
-          Baths:
-          <select id='min_baths'>
-            <option value='-1'>-1</option>
-            <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6'>6</option> 
-          </select>
-          -
-          <select id='max_baths'>
-            <option value='1'>1</option>
-            <option value='2'>2</option>
-            <option value='3'>3</option>
-            <option value='4'>4</option>
-            <option value='5'>5</option>
-            <option value='6' selected>6</option>
-          </select>
-          Sq.ft.:
-          <input id='min_sqft' class='sqft' value='0' />
-          -
-          <input id='max_sqft' class='sqft' value='10000' />
-
-          <br/>
-
-          Address: <input id='address' />
+          <div id='selector_left'>
+            <div id='bed_outer' class='slider_outer'>
+              <div>
+                <div id='slide_bed' class='allsliders slider_ui'></div>
+                <div id='slide_bed_val' class='allsliders slider_vals'></div>
+              </div>
+            </div>
+            <div id='bath_outer' class='slider_outer'>
+              <div>
+                <div id='slide_bath' class='allsliders slider_ui'></div>
+                <div id='slide_bath_val' class='allsliders slider_vals'></div>
+              </div>
+            </div>
+          </div>
+          <div id='selector_right'>
+            <div id='bed_outer' class='slider_outer'>
+              <div>
+                <div id='slide_price' class='allsliders slider_ui'></div>
+                <div id='slide_price_val' class='allsliders slider_vals'></div>
+              </div>
+            </div>
+            <div id='bath_outer' class='slider_outer'>
+              <div>
+                <div id='slide_sqft' class='allsliders slider_ui'></div>
+                <div id='slide_sqft_val' class='allsliders slider_vals'></div>
+              </div>
+            </div>
+          </div>
+          <div id='search_box'>
+            <div id='map-spinner' class='wait-spinner'>
+              <img src="box.gif" width="60" />
+            </div>
+          </div>
+          <div id='location_div'>
+            <span class="ui_label">Location: </span><input id='address' />
+          </div>
         </div>
-      </div>
-
-      <div id='curlBox'>
-        cURL request: <input id="curl" value="">
-        <button class="btn" id="btnCopy" data-clipboard-target="#curl">
-            <img src="copy.png" id='copyPng' alt="Copy to clipboard">
-        </button>
+        <div id='curlBox'>
+          <span class="ui_label">cURL request: </span><input id="curl" value="">
+          <button class="btn" id="btnCopy" data-clipboard-target="#curl">
+              <img src="copy.png" id='copyPng' alt="Copy to clipboard">
+          </button>
+        </div>
       </div>
 
       <div id='errorBox'>Err</div>
 
       <div id="tabs">
           <ul>
-              <li><a href="#tabs-1">Analysis</a>
+              <li><a href="#tabs-1">Map</a>
               </li>
-              <li><a href="#tabs-2">Map</a>
+              <li><a href="#tabs-2">Analysis</a>
               </li>
               <li><a href="#tabs-3">Raw data</a>
               </li>
           </ul>
           <div id="tabs-1">
+            <div id='mapContainer'>
+              <div id='map'></div>
+              <div>
+                <div class='westOfMap' id='info'></div>
+                <div class='westOfMap' id='summary'></div>
+              </div>
+            </div>
+          </div>
+          <div id="tabs-2">
             <table>
               <tr>
                 <td></td>
@@ -125,9 +135,6 @@
                 <td class='plotCell' id='SqftVSqft'></td>
               </tr>
             </table>
-          </div>
-          <div id="tabs-2">
-            <div id='map'></div>
           </div>
           <div id="tabs-3">
             <table id='myTable' class="tablesorter">
