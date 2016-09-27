@@ -43,6 +43,8 @@ var ApiConnectorSingleton = (function () {
                 if (!this.busy && this.numCalls < 99) {
                   console.log(["Requesting", this.limit, this.offset, this.count, this.numCalls])
                   murl = update_curl_req(cloned)
+                  //$("#curl").val(murl) # this would include the offset, which is wierd
+                  console.log(murl)
                   this.busy = true
                   var api = this
                   $.ajax({

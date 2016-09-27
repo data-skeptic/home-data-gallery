@@ -80,7 +80,7 @@ function writeLocalStorage(response) {
           localStorage.setItem(elem['id'], JSON.stringify(toCache))
         } catch (err) {
           if (err.name == "QuotaExceededError") {
-            //console.log("Quota issue")
+            console.log("Quota issue")
             // TODO: handle it better
           } else {
             console.log(err)
@@ -123,10 +123,10 @@ function isInside(lat, lon, bbox) {
 }
 
 function readPropertiesFromLocalStorage(viewport, filters) {
-  var lat1 = bbox.top
-  var lon1 = bbox.left
-  var lat2 = bbox.bottom
-  var lon2 = bbox.right
+  var lat1 = viewport.top
+  var lon1 = viewport.left
+  var lat2 = viewport.bottom
+  var lon2 = viewport.right
   var clat = (lat1 - lat2)/2 + lat2
   var clon = (lon1 - lon2)/2 + lon2
 
@@ -137,8 +137,9 @@ function readPropertiesFromLocalStorage(viewport, filters) {
   cmatches = []
   $.each(kdmatches, function(i, match) {
     match = match[0] // trim off distance value
+    console.log(match['id'])
     // Trim radius result down to viewport
-    if (isInside(match['latitude'], match['longitude'], bbox)) {
+    if (isInside(match['latitude'], match['longitude'], viewport)) {
       cmatches.push(match)
     }
   })
