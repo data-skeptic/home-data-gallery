@@ -98,8 +98,8 @@ $(document).ready(function() {
   $("#btnSearch").click(doSearch)
 
   // Initialize the sliders in the header
-  sliders['bed'] = slider("#slide_bed", -1, 6, [1, 3], "Beds: ")
-  sliders['bath'] = slider("#slide_bath", -1, 4, [1, 2], "Baths: ")
+  sliders['bed'] = slider("#slide_bed", -1, 11, [1, 3], "Beds: ")
+  sliders['bath'] = slider("#slide_bath", -1, 8, [1, 2], "Baths: ")
   sliders['price'] = slider("#slide_price", -1, state['max_price'], [state['min_price'], state['max_price']], "Price: ")
   sliders['sqft'] = slider("#slide_sqft", -1, state['max_sqft'], [state['min_sqft'], state['max_sqft']], "SQ.FT.: ")
 
