@@ -61,3 +61,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+#Webpack Generated Files
+js/scripts.min.js
