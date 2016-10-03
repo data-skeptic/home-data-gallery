@@ -13,3 +13,9 @@ This repo is a Javascript based web front end that gets data from the OpenHouse 
 * Make a pull request.
 * Check out our [Waffle page](https://waffle.io/data-skeptic/home-data-gallery) of open tasks.
 * [Join the team](https://dataskeptic.slack.com).
+
+
+`npm install babel-core babel-loader jshint jshint-loader node-libs-browser babel-preset-es2015 babel-preset-react webpack babel-plugin-react-html-attrs babel-plugin-transform-decorators-legacy babel-plugin-transform-class-properties babel-preset-stage-0 react react-json-table react-dom jquery geoip-local underscore geoip-lite net json-loader react-d3-map rc-slider --save-dev`
+
+`webpack --watch`
+
