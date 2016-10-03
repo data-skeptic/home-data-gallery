@@ -4,14 +4,14 @@ import JsonTable from "react-json-table"
 
 export default class DataTable extends React.Component {
 
-  constructor() {
-  	super()
+  constructor(props) {
+  	super(props)
   	this.state = {
     	row: false,
     	cell: false,
     	sort: false
   	}
-    console.log("init")
+    this.getSettings = this.getSettings.bind(this)
   }
 
   changeData(rows) {
@@ -19,21 +19,32 @@ export default class DataTable extends React.Component {
   }
 
   render() {
-    var me = this,
-        // clone the rows
-        items = this.props.rows.slice()
+    var olistings = this.props.listings
+    var listings = JSON.parse(JSON.stringify(olistings))
+    for (var i=0; i < listings.length; i++) {
+      var listing = listings[i]
+      delete listing['id']
+      delete listing['submitter']
+      delete listing['upload_timestamp']
+      delete listing['raw_address']
+      delete listing['valid']
+      delete listing['features']
+      if (listing['address_object'] !== undefined) {
+        listing['address'] = listing['address_object']['formatted_address']
+        delete listing['address_object']
+      }
+    }
 
     // Sort the table
-    console.log(this)
-    console.log(this.state)
+    var me = this
     if( this.state.sort ){
-      items.sort( function( a, b ){
+      listings.sort( function( a, b ){
          return a[ me.state.sort ] > b[ me.state.sort ] ? 1 : -1;
       });
     }
 
     return <JsonTable
-      rows={items}
+      rows={listings}
       settings={ this.getSettings() }
       onClickCell={ this.onClickCell.bind(this) }
       onClickHeader={ this.onClickHeader.bind(this) }
