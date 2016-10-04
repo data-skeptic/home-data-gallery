@@ -27,6 +27,12 @@ export default class App extends React.Component {
 		  	address: "Loading..."
 		  }
 		];
+		var searchCriteria = {
+			price: [0, 1000000],
+			bedrooms: [0, 8],
+			bathrooms: [0, 7],
+			sqft: [100, 4000],
+		}
 		this.state = {
 			listings: listings,
 			waiting: false,
@@ -35,10 +41,12 @@ export default class App extends React.Component {
 			offset: 0,
 			numCalls: 0,
 			changed: false,
-			busy: false
+			busy: false,
+			searchCriteria: searchCriteria
 		}
 		this.tick = this.tick.bind(this)
 		this.addNewProperties = this.addNewProperties.bind(this)
+		this.updateSearchCriteria = this.updateSearchCriteria.bind(this)
 	}
 	componentDidMount() {
 		this.timer = setInterval(this.tick, 1000)
@@ -47,10 +55,26 @@ export default class App extends React.Component {
 	componentWillUnmount() {
 		clearInterval(this.time)
 	}
+	/*
+		This function is called by `Controls` which sends updates
+		only when the user has finished changing a slider component
+	*/
+	updateSearchCriteria(ncriteria) {
+		var criteria = this.state
+		var keys = Object.keys(ncriteria)
+		for (var i=0; i < keys.length; i++) {
+			var key = keys[i]
+			var range = ncriteria[key]
+			var sc = criteria.searchCriteria
+			sc[key] = range
+		}
+		this.setState(criteria)
+	}
 	addNewProperties(resp) {
 		var listings = resp["results"]
 		var count = resp['count']
-		var offset = count //resp['results'].length
+		var offset = resp['results'].length
+		offset = count // This line tells it to give up after 1 call, good for development
 		// TODO: Better forward crawling management
 		var busy = false
 		// TODO: This code works but seems to throw a serious warning!  What to do?
@@ -95,7 +119,7 @@ export default class App extends React.Component {
 	render() {
 	    return (<div>
 	    		  <Header />
-	    		  <Controls count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} />
+	    		  <Controls count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
 	    		  <DataView listings={this.state.listings} />
 	    		  <Footer />
 	           </div>)
