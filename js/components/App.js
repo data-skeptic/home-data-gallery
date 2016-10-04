@@ -95,7 +95,7 @@ export default class App extends React.Component {
 	render() {
 	    return (<div>
 	    		  <Header />
-	    		  <Controls count={this.state.count} busy={this.state.busy} changed={this.state.changed} />
+	    		  <Controls count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} />
 	    		  <DataView listings={this.state.listings} />
 	    		  <Footer />
 	           </div>)

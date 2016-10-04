@@ -19,8 +19,8 @@ export default class Controls extends React.Component {
             			<MSlider title='sq.ft.' />
                 </div>
                 <div id='controls-right'>
+                  <p>Loading: {this.props.offset}/{this.props.count}</p>
                   {this.props.busy | this.props.changed ? <img src="box.gif" width="60" />: ""}
-                  {this.props.count}
                 </div>
            </div>)
   }
