@@ -1,7 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-
-import Nouislider from 'react-nouislider'
+import Rcslider from "rc-slider"
 
 export default class Slider extends React.Component {
 
@@ -17,43 +16,35 @@ export default class Slider extends React.Component {
 		}
 	}
 
-	onUpdate(event) {
+	onPartialUpdate(event) {
 		var input = event.target
-		console.log(event)
+		this.setState({'low': event[0], 'high': event[1]})
+	}
+
+	onUpdate(event) {
+		// update search
+		console.log("full")
 	}
 
 	render() {
 		var min_value = this.state.min_value
 		var max_value = this.state.max_value
-		var start_low = this.state.low
-		var start_high = this.state.high
+		var low = this.state.low
+		var high = this.state.high
+		var defVal = [low, high]
+		var low_label  = low.toString()
+		var high_label = high.toString()
     	return (<div class='slider'>
-				  <Nouislider
-				  	onUpdate={this.onUpdate}
-				    range={{min: min_value, max: max_value}}
-				    start={[start_low, start_high]}
+				  <Rcslider
+				   min={this.state.min_value}
+				   max={this.state.max_value}
+				   allowCross={false}
+				   range={true}
+				   defaultValue={defVal}
+				   onChange={this.onPartialUpdate.bind(this)}
+				   onAfterChange={this.onUpdate.bind(this)}
 				  />
-      		<center><span class='slider_label'>{this.props.title}: {start_low} to {start_high}</span></center>
+      		<center><span class='slider_label'>{this.props.title}: {low_label} to {high_label}</span></center>
            </div>)
 	}
 }
-/*
-	noUiSlider.create(slider, {
-		start: start,
-		connect: true,
-		range: {
-			'min': [min_val],
-			'1%': [min_val, 1],
-			'max': [max_val]
-		}
-	})
-
-	slider.noUiSlider.on('update', function( values, handle ) {
-		svals = slider.noUiSlider.get()
-		low = parseFloat(svals[0])
-		high = parseFloat(svals[1])
-		content = "<center><span class='slider_label'>" + label + low + " to " + high + "</span></center>"
-		value_pane.html(content)
-
-}
-*/
