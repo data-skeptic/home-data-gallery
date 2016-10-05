@@ -4,6 +4,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --inline --hot",
+    "Dev ^ Not working": "TODO",
+    "start": "http-server",
+    "watch": "webpack -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -33,6 +36,7 @@
     "babel-preset-stage-0": "^6.16.0",
     "geoip-lite": "^1.1.8",
     "geoip-local": "^1.0.7",
+    "http-server": "^0.9.0",
     "jquery": "^3.1.1",
     "jshint": "^2.9.3",
     "jshint-loader": "^0.8.3",
