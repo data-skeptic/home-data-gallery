@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- find a way to migrate this to a framework -->
+<html>
+<head>
+	<title>Javascript tests</title>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="https://mottie.github.io/tablesorter/css/theme.blue.css" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="scripts/code.js"></script>
+    <script src="scripts/heatmap.js"></script>
+    <script src="scripts/scatterplot.js"></script>
+    <script src="scripts/histogram.js"></script>
+    <script src="scripts/updateTable.js"></script>
+    <script src="scripts/map.js"></script>
+    <script src="scripts/slider.js"></script>
+    <script src="scripts/kdTree-min.js"></script>
+    <script src="scripts/localStorageIO.js"></script>
+    <script src="scripts/localStorageIO_test.js"></script>
+    <script src="scripts/APIConnectorSingleton.js"></script>
+    <script src="scripts/APIConnectorSingleton_test.js"></script>
+</head>
+<body>
+
+<script>
+function assertTrue(title, b) {
+	if (b) {
+		res = "pass"
+	} else {
+		res = "fail"
+	}
+	s = title + '... ' + res
+	$("body").append('<div>' + s + '</div>')
+	console.log(s)
+}
+
+document.addEventListener("DOMContentLoaded", function(event) { 
+    assertTrue("write_and_recall_test", write_and_recall_test())
+    assertTrue("radius_search_test", radius_search_test())
+    assertTrue("add_several_test", add_several_test())
+    assertTrue("search_with_filters", search_with_filters())
+    assertTrue("kd_tree_test", kd_tree_test())
+    assertTrue("update_on_duplicate_test", update_on_duplicate_test())
+    assertTrue("singleton_works_test", singleton_works_test())
+    assertTrue("is_running_test", is_running_test())
+});
+</script>
+
+</body>
+</html>

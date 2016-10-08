@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+node_modules/
 *.py[cod]
 *$py.class
 
@@ -60,3 +61,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+#Webpack Generated Files
+js/scripts.min.js

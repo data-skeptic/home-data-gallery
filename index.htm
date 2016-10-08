@@ -11,6 +11,7 @@
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.10/clipboard.min.js"></script>
+    <script src="scripts/ApiConnectorSingleton.js"></script>
     <script src="scripts/code.js"></script>
     <script src="scripts/heatmap.js"></script>
     <script src="scripts/scatterplot.js"></script>
@@ -19,6 +20,7 @@
     <script src="scripts/map.js"></script>
     <script src="scripts/slider.js"></script>
     <script src="scripts/kdTree-min.js"></script>
+    <script src="scripts/localStorageIO.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/8.5.1/nouislider.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.4.1/math.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/lib/OpenLayers.js"></script>
@@ -59,7 +61,9 @@
             </div>
           </div>
           <div id='search_box'>
-            <button class="btn" id="btnSearch">Search</button>
+            <div id='map-spinner' class='wait-spinner'>
+              <img src="box.gif" width="60" />
+            </div>
           </div>
           <div id='location_div'>
             <span class="ui_label">Location: </span><input id='address' />
@@ -85,17 +89,9 @@
               </li>
           </ul>
           <div id="tabs-1">
-            <div id='map-spinner' class='wait-spinner'>
-              <img src="box.gif" />
-            </div>
             <div id='mapContainer'>
               <div id='map'></div>
               <div>
-                <div class='westOfMap' id='searchAgain'>
-                  Re-search this area?
-                  <button id="btnSearchYes" class="btn">Yes</button>
-                  <button id="btnSearchNo" class="btn">No</button>
-                </div>
                 <div class='westOfMap' id='info'></div>
                 <div class='westOfMap' id='summary'></div>
               </div>
@@ -141,9 +137,6 @@
             </table>
           </div>
           <div id="tabs-3">
-            <div id='table-spinner' class='wait-spinner'>
-              <img src="box.gif" />
-            </div>
             <table id='myTable' class="tablesorter">
             <thead>
               <tr>
