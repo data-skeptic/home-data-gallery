@@ -48,6 +48,32 @@ body {
 	DATA TABLE
 **********************************************************/
 
+.jsonTable {
+}
+
+.jsonHeader {
+
+}
+
+.jsonColumn {
+  background-color: #ddd;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.jsonRow {
+
+}
+
+.jsonOdd {
+  background-color: #fefefe;
+}
+
+.jsonEven {
+  background-color: #efefef;
+}
+
 /*********************************************************
 	MAP
 **********************************************************/
