@@ -14,10 +14,6 @@ export default class DataTable extends React.Component {
     this.getSettings = this.getSettings.bind(this)
   }
 
-  changeData(rows) {
-  	this.setState({rows})
-  }
-
   render() {
     var olistings = this.props.listings
     var listings = JSON.parse(JSON.stringify(olistings))
