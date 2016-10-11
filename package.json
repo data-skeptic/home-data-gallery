@@ -52,5 +52,13 @@
     "underscore": "^1.8.3",
     "webpack": "^1.13.2"
   },
-  "description": ""
+  "description": "[![Stories in Ready](https://badge.waffle.io/data-skeptic/home-data-gallery.png?label=ready&title=Ready)](https://waffle.io/data-skeptic/home-data-gallery) # OpenHouse Interactive Tool This repo is a Javascript based web front end that gets data from the OpenHouse API and allows users to interact with it via map, search filters, visualizations, and data dumps.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/data-skeptic/home-data-gallery.git"
+  },
+  "bugs": {
+    "url": "https://github.com/data-skeptic/home-data-gallery/issues"
+  },
+  "homepage": "https://github.com/data-skeptic/home-data-gallery#readme"
 }
