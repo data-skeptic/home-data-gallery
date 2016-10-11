@@ -1,9 +1,11 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import { Map, MarkerGroup } from "react-d3-map"
+import { ZoomControl } from "react-d3-map-core"
+
 import * as topojson from "topojson"
 
-import Markers from './Markers'
+import Marker from './Marker'
 
 export default class OpenHouseMap extends React.Component {
   
@@ -12,13 +14,35 @@ export default class OpenHouseMap extends React.Component {
   	this.state = {
   		lat: -100.95,
   		lng: 40.7,
-  		zoom: 13
+  		scale: (1 << 12),
+      selected: undefined
   	}
+    this.onChange = this.onChange.bind(this)
+    this.zoomIn = this.zoomIn.bind(this)
+    this.zoomOut = this.zoomOut.bind(this)
     this.popupContent = this.popupContent.bind(this)
     this.onMarkerMouseOut = this.onMarkerMouseOut.bind(this)
     this.onMarkerMouseOver = this.onMarkerMouseOver.bind(this)
     this.onMarkerClick = this.onMarkerClick.bind(this)
     this.onMarkerCloseClick = this.onMarkerCloseClick.bind(this)
+  }
+
+  onChange() {
+    console.log("hi")
+  }
+
+  zoomOut() {
+    console.log("zo")
+    this.setState({
+      scale: this.state.scale / 2
+    })
+  }
+
+  zoomIn() {
+    console.log("zi")
+    this.setState({
+      scale: this.state.scale * 2
+    })
   }
 
   popupContent(d) { return d.properties.name; }
@@ -30,16 +54,16 @@ export default class OpenHouseMap extends React.Component {
     console.log('over')
   }
   onMarkerClick(dom, d, i) {
-    console.log('clicks')
+    this.setState( {selected: d["properties"]["listing"]} )
   }
   onMarkerCloseClick(id) {
     console.log('close click')
   }
 
-  createMarker(lat, lng, props) {
+  createMarker(lat, lng, lprops) {
     return {
       "type":"Feature",
-      "properties":props,
+      "properties":lprops,
       "geometry":{
         "type":"Point",
         "coordinates":[lng, lat]
@@ -57,23 +81,24 @@ export default class OpenHouseMap extends React.Component {
         var lat = ao['latitude']
         var lng = ao['longitude']
         var raw = ao['raw_address']
-        var props = {"title":raw}
-        var marker = this.createMarker(lat, lng, props)
+        var lprops = {"listing":listing}
+        var marker = this.createMarker(lat, lng, lprops)
         data["features"].push(marker)
       }
     }
 
     var width = 400
     var height = 300
-    var scale = 1 << 12
     var scaleExtent = [1 << 10, 1 << 14]
     const position = [this.state.lat, this.state.lng];
+    console.log("scale:")
+    console.log(this.state.scale)
     return (
     <div>
       <Map
         width= {width}
         height= {height}
-        scale= {scale}
+        scale= {this.state.scale}
         scaleExtent= {scaleExtent}
         center= {position}>
         <MarkerGroup
@@ -86,7 +111,13 @@ export default class OpenHouseMap extends React.Component {
           onMouseOut= {this.onMarkerMouseOut}
           markerClass= {"map-marker"}
         />          
+      <ZoomControl
+        zoomInClick= {this.zoomIn}
+        zoomOutClick= {this.zoomOut}
+      />      
       </Map>
+      <Marker listing={this.state.selected}>
+      </Marker>
     </div>
     )
   }
