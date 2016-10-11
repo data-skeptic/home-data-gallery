@@ -2,12 +2,23 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 export default class Markers extends React.Component {
+  constructor(props) {
+  	super(props)
+  }
 
   render() {
-	var markers = this.props.listings
-	var markerComponents = markers.map(function(marker) {
-		return <div className="marker">8</div>
-	})
-    return (<div>OH Map {markerComponents}</div>)
+  	if (this.props.listing != undefined) {
+  		var listing = this.props.listing
+  		console.log(listing)
+  		return (<div id="map-listing-detail">
+  			<b>{listing.address_object.formatted_address}</b><br/>
+  			<i>${listing.price}</i><br/>
+  			<span class='map-listing-detail-title'>Beds</span>: {listing.bedrooms}
+  			<span class='map-listing-detail-title'>Baths</span>: {listing.bathrooms}
+  			<span class='map-listing-detail-title'>sq.ft.</span>: {listing.building_size}
+  		</div>)
+  	} else {
+  		return (<div id="map-listing-detail"></div>)
+  	}
   }
 }
