@@ -17,7 +17,6 @@ export default class OpenHouseMap extends React.Component {
 
   render() {
     const position = [this.state.lat, this.state.lng];
-    return (<div>Map here</div>)
     return (
       <Map class='ohmap' center={position} zoom={this.state.zoom}>
        <TileLayer

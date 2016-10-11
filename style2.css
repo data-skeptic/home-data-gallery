@@ -56,6 +56,9 @@ body {
     height: 50px;
     width: 100px;
 }
+.ohmap {
+  width:100px;
+}
 
 /*********************************************************
 	PLOTS
@@ -81,6 +84,28 @@ body {
 /*********************************************************
 	SLIDER
 **********************************************************/
+
+.slider {
+  margin-bottom: 5px;
+  margin-left: 10px;
+  width: 175px;
+  height: 40px;
+}
+.slider_vals {
+  height: 20px;
+  line-height: 25px;
+}
+.slider_outer {
+  height: 40px;
+}
+.slider_label {
+  font-size: 8pt;
+}
+
+
+
+
+
 
 .rc-slider {
   position: relative;
@@ -338,46 +363,6 @@ body {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.slider {
-  margin-bottom: 5px;
-  margin-left: 10px;
-  width: 175px;
-  height: 40px;
-}
-.slider_vals {
-  height: 20px;
-  line-height: 25px;
-}
-.slider_outer {
-  height: 40px;
-}
-.slider_label {
-  font-size: 8pt;
-}
 
 
 

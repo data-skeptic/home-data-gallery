@@ -69,15 +69,19 @@ export default class App extends React.Component {
 			sc[key] = range
 		}
 		this.setState(criteria)
+		// TODO: update from cache
+		// TODO: update ajax
 	}
 	addNewProperties(resp) {
 		var listings = resp["results"]
 		var count = resp['count']
 		var offset = resp['results'].length
-		offset = count // This line tells it to give up after 1 call, good for development
 		// TODO: Better forward crawling management
-		var busy = false
-		// TODO: This code works but seems to throw a serious warning!  What to do?
+		var busy = true
+		if (true) { // This line tells it to give up after 1 call, good for development
+			offset = count
+			busy = false
+		}
 		this.setState({count, offset, busy, listings})
 		// TODO: import kd tree and do eviction
 		// TODO: Do filtering
@@ -87,9 +91,6 @@ export default class App extends React.Component {
 	    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
 	    this.filters = get_request()
 	    results = readPropertiesFromLocalStorage(bbox, this.filters)
-	    updateMap(results)
-	    updateTable(results) // updateTable.js
-	    makePlots(results)
 	    */
 	}
 	tick() {
