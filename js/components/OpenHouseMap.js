@@ -19,6 +19,19 @@ export default class OpenHouseMap extends React.Component {
     this.onMarkerMouseOver = this.onMarkerMouseOver.bind(this)
     this.onMarkerClick = this.onMarkerClick.bind(this)
     this.onMarkerCloseClick = this.onMarkerCloseClick.bind(this)
+    this.componentWillMount = this.componentWillMount.bind(this)
+    this.componentDidMount = this.componentDidMount.bind(this)
+  }
+
+  updateDimensions() {
+    console.log("Update viewport")
+  }
+
+  componentWillMount() {
+    this.updateDimensions()
+  }
+  componentDidMount() {
+    window.addEventListener("click", this.updateDimensions)
   }
 
   popupContent(d) { return d.properties.name; }
@@ -48,6 +61,7 @@ export default class OpenHouseMap extends React.Component {
   }
 
   render() {
+    console.log("render map")
     var data = {"type":"FeatureCollection","features":[]}
     var listings = this.props.listings
     for (var i=0; i < listings.length; i++) {
