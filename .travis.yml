@@ -1,9 +1,14 @@
-language: python
-python:
-    - 3.5
+language: node_js
+
+node_js:
+    - stable
+
+before_script:
+    - "npm install --prod"
+
 script:
-    - "pip install jupyter nbconvert"
-    - "jupyter nbconvert --to HTML ./**.ipynb"
+    - "npm run prod"
+
 deploy:
     - provider: s3
       access_key_id: $S3_ID
@@ -11,6 +16,13 @@ deploy:
       bucket: gallery-content.dataskeptic.com
       endpoint: gallery-content.dataskeptic.com.s3-website-ap-southeast-2.amazonaws.com
       region: ap-southeast-2
-      skip_cleanup: true
+      skip_cleanup: false
       on:
           branch: master
+
+notifications:
+  email:
+    recipients:
+      - kyle@dataskeptic.com
+    on_success: always
+    on_failure: always
