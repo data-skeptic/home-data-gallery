@@ -4,7 +4,6 @@ node_js:
     - stable
 
 before_script:
-    - "npm init"
     - "npm install --prod"
 
 script:
