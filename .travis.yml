@@ -14,3 +14,10 @@ deploy:
       skip_cleanup: true
       on:
           branch: master
+
+notifications:
+  email:
+    recipients:
+      - kyle@dataskeptic.com
+    on_success: always
+    on_failure: always
