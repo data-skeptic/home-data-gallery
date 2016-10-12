@@ -7,6 +7,7 @@
     "Dev ^ Not working": "TODO",
     "prod": "webpack",
     "start": "http-server",
+    "clean": "rm -r js/scripts.min.js",
     "watch": "webpack -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

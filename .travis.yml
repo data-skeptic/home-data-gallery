@@ -5,6 +5,7 @@ node_js:
 
 before_script:
     - "npm install --prod"
+    - "npm run clean"
 
 script:
     - "npm run prod"
