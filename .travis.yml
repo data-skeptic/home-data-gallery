@@ -16,7 +16,7 @@ deploy:
       bucket: gallery-content.dataskeptic.com
       endpoint: gallery-content.dataskeptic.com.s3-website-ap-southeast-2.amazonaws.com
       region: ap-southeast-2
-      skip_cleanup: true
+      skip_cleanup: false
       on:
           branch: master
 
