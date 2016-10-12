@@ -50,7 +50,6 @@
     "react-dom": "^0.14.8",
     "react-json-table": "^0.1.1",
     "react-nouislider": "^1.14.0",
-    "topojson": "^1.6.27",
     "underscore": "^1.8.3",
     "webpack": "^1.13.2"
   },

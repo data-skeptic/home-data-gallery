@@ -1,7 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import { Map, MarkerGroup } from "react-d3-map"
-import * as topojson from "topojson"
 
 import Markers from './Markers'
 
