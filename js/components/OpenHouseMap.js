@@ -58,7 +58,6 @@ export default class OpenHouseMap extends React.Component {
   }
 
   render() {
-    console.log("render map")
     var data = {"type":"FeatureCollection","features":[]}
     var listings = this.props.listings
     for (var i=0; i < listings.length; i++) {

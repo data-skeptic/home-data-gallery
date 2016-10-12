@@ -42,6 +42,7 @@ export default class App extends React.Component {
 			numCalls: 0,
 			changed: false,
 			busy: false,
+			curl: '',
 			searchCriteria: searchCriteria
 		}
 		this.tick = this.tick.bind(this)
@@ -55,6 +56,7 @@ export default class App extends React.Component {
 	componentWillUnmount() {
 		clearInterval(this.time)
 	}
+
 	/*
 		This function is called by `Controls` which sends updates
 		only when the user has finished changing a slider component
@@ -68,7 +70,7 @@ export default class App extends React.Component {
 			var sc = criteria.searchCriteria
 			sc[key] = range
 		}
-		this.setState(criteria)
+		this.setState({criteria: criteria, offset: 0, count: 1})
 		// TODO: update from cache
 		// TODO: update ajax
 	}
@@ -98,9 +100,18 @@ export default class App extends React.Component {
 			var offset = this.state.offset
 			var limit = this.state.limit
 			var count = this.state.count
+			var minprice = this.state.searchCriteria.price[0]
+			var maxprice = this.state.searchCriteria.price[1]
+			var minbed = this.state.searchCriteria.bedrooms[0]
+			var maxbed = this.state.searchCriteria.bedrooms[1]
+			var minbath = this.state.searchCriteria.bathrooms[0]
+			var maxbath = this.state.searchCriteria.bathrooms[1]
+			var minsqft = this.state.searchCriteria.sqft[0]
+			var maxsqft = this.state.searchCriteria.sqft[1]
 			if (offset < count) {
-				this.setState({busy: true})
-				var url = `http://api.openhouseproject.co/api/property/?min_price=100000&max_price=10000000&min_bedrooms=1&max_bedrooms=3&min_bathrooms=1&max_bathrooms=2&min_building_size=0&max_building_size=10000&limit=${limit}&offset=${offset}`
+				var curl = `http://api.openhouseproject.co/api/property/?min_price=${minprice}&max_price=${maxprice}&min_bedrooms=${minbed}&max_bedrooms=${maxbed}&min_bathrooms=${minbath}&max_bathrooms=${maxbath}&min_building_size=${minsqft}&max_building_size=${maxsqft}`
+				var url = curl + `&limit=${limit}&offset=${offset}`
+				this.setState({busy: true, curl: curl})
 				var me = this
 				$.ajax({
 				  url: url,
@@ -120,7 +131,7 @@ export default class App extends React.Component {
 	render() {
 	    return (<div>
 	    		  <Header />
-	    		  <Controls count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
+	    		  <Controls count={this.state.count} offset={this.state.offset} busy={this.state.busy} curl={this.state.curl} changed={this.state.changed} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
 	    		  <DataView listings={this.state.listings} />
 	    		  <Footer />
 	           </div>)

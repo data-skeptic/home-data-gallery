@@ -7,11 +7,11 @@ export default class Slider extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			onUpdate: props.onUpdate,
-			min_value: props.min_value,
-			max_value: props.max_value,
-			low: props.low,
-			high: props.high,
+			onUpdate: this.props.onUpdate,
+			min_value: this.props.min_value,
+			max_value: this.props.max_value,
+			low: this.props.low,
+			high: this.props.high,
 			include_any: true,
 			include_all: true
 		}

@@ -44,6 +44,24 @@ body {
 	margin-left: 30px;
 }
 
+.btn {
+    height: 15px;
+}
+
+#btnCopy {
+    width: 25px;
+    height: 15px;
+}
+
+#copyPng {
+    height: 15px;
+}
+
+#curl {
+  font-size: 8pt;
+  height: 20px;
+}
+
 /*********************************************************
 	DATA TABLE
 **********************************************************/

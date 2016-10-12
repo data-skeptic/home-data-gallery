@@ -22,7 +22,7 @@ export default class Controls extends React.Component {
     	return (<div id="controls">
                 <div id='controls-left'>
             			<Slider title='Beds' min_value={0} max_value={10} low={this.props.searchCriteria.bedrooms[0]} high={this.props.searchCriteria.bedrooms[1]} onUpdate={this.onUpdate.bind(this, 'bedrooms')} />
-            			<Slider title='Bath' min_value={0} max_value={10} low={this.props.searchCriteria.bathrooms[0]} high={this.props.searchCriteria.bathrooms[1]} onUpdate={this.onUpdate.bind(this), 'bathrooms'} />
+            			<Slider title='Bath' min_value={0} max_value={10} low={this.props.searchCriteria.bathrooms[0]} high={this.props.searchCriteria.bathrooms[1]} onUpdate={this.onUpdate.bind(this, 'bathrooms')} />
                 </div>
                 <div id='controls-center'>
             			<Slider title='Price' min_value={0} max_value={100000000} low={this.props.searchCriteria.price[0]} high={this.props.searchCriteria.price[1]} onUpdate={this.onUpdate.bind(this, 'price')} />
@@ -31,6 +31,13 @@ export default class Controls extends React.Component {
                 <div id='controls-right'>
                   <p>Loading: {this.props.offset}/{this.props.count}</p>
                   {this.props.busy | this.props.changed ? <img src="box.gif" width="60" />: ""}
+                  <div id='curlBox'>
+                    <span class="ui_label">cURL request: </span>
+                    <input id="curl" value={this.props.curl} />
+                    <button class="btn" id="btnCopy" data-clipboard-target="#curl">
+                        <img src="copy.png" id='copyPng' alt="Copy to clipboard" />
+                    </button>
+                  </div>
                 </div>
            </div>)
   }
