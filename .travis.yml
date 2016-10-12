@@ -1,9 +1,15 @@
-language: python
-python:
-    - 3.5
+language: node_js
+
+node_js:
+    - stable
+
+before_script:
+    - "npm init"
+    - "npm install --prod"
+
 script:
-    - "pip install jupyter nbconvert"
-    - "jupyter nbconvert --to HTML ./**.ipynb"
+    - "npm publish"
+
 deploy:
     - provider: s3
       access_key_id: $S3_ID
