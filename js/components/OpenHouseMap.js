@@ -2,8 +2,6 @@ import React from "react"
 import ReactDOM from "react-dom"
 import { Map, MarkerGroup } from "react-d3-map"
 
-import Markers from './Markers'
-
 export default class OpenHouseMap extends React.Component {
   
   constructor(props) {
