@@ -1,4 +1,5 @@
 [![Stories in Ready](https://badge.waffle.io/data-skeptic/home-data-gallery.png?label=ready&title=Ready)](https://waffle.io/data-skeptic/home-data-gallery)
+
 # OpenHouse Interactive Tool
 This repo is a Node.js webapp with React.js.  It retrieves data via the OpenHouse API and allows visitors to interact with and visualize the data made available by the OpenHouse Project.  Visitors to this tool can see properties on a map, datatable, or visualizations.
 
