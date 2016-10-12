@@ -7,7 +7,7 @@ before_script:
     - "npm install --prod"
 
 script:
-    - "npm build"
+    - "npm run prod"
 
 deploy:
     - provider: s3
