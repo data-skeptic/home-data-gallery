@@ -23,7 +23,10 @@ export default class DataTable extends React.Component {
       delete listing['submitter']
       delete listing['upload_timestamp']
       delete listing['raw_address']
+      delete listing['size_units']
       delete listing['valid']
+      delete listing['latitude']
+      delete listing['longitude']
       delete listing['features']
       if (listing['address_object'] !== undefined) {
         listing['address'] = listing['address_object']['formatted_address']
@@ -39,8 +42,25 @@ export default class DataTable extends React.Component {
       });
     }
 
+
+    var columns = [
+        {key: 'listing_timestamp', label: 'Timestamp'},
+        {key: 'listing_type', label: 'Type', cell: function( item, columnKey ) {
+          // TODO: use this template to make the columns more interesting
+          return <span style={{color: 'black'}}>{item.listing_type}</span>
+        }},
+        {key: 'price', label: 'Price'},
+        {key: 'bedrooms', label: 'Bedrooms'},
+        {key: 'bathrooms', label: 'Bathrooms'},
+        {key: 'car_spaces', label: 'Car Spaces'},
+        {key: 'building_size', label: 'Sq.ft.'},
+        {key: 'land_size', label: 'Land size'},
+        {key: 'address', label: 'Address'}
+    ]
+
     return <JsonTable
-      rows={listings}
+      rows={ listings }
+      columns={ columns }
       settings={ this.getSettings() }
       onClickCell={ this.onClickCell.bind(this) }
       onClickHeader={ this.onClickHeader.bind(this) }
