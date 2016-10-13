@@ -19,6 +19,24 @@ deploy:
       skip_cleanup: false
       on:
           branch: master
+    - provider: s3
+      access_key_id: $S3_ID_PROD
+      secret_access_key: $S3_SECRET_PROD
+      bucket: gallery.openhouseproject.co
+      endpoint: http://gallery.openhouseproject.co.s3-website-us-east-1.amazonaws.com/
+      skip_cleanup: true
+      acl: public_read
+      on:
+          branch: master
+    - provider: s3
+      access_key_id: $S3_ID_PROD
+      secret_access_key: $S3_SECRET_PROD
+      bucket: gallery-dev.openhouseproject.co
+      endpoint: http://gallery-dev.openhouseproject.co.s3-website-us-east-1.amazonaws.com/
+      skip_cleanup: true
+      acl: public_read
+      on:
+          branch: dev
 
 notifications:
   email:

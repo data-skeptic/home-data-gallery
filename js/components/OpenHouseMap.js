@@ -16,6 +16,7 @@ export default class OpenHouseMap extends React.Component {
       selected: undefined
   	}
     this.onChange = this.onChange.bind(this)
+    this.onZoom = this.onZoom.bind(this)
     this.zoomIn = this.zoomIn.bind(this)
     this.zoomOut = this.zoomOut.bind(this)
     this.popupContent = this.popupContent.bind(this)
@@ -50,6 +51,10 @@ export default class OpenHouseMap extends React.Component {
 
   onChange() {
     console.log("hi")
+  }
+
+  onZoom() {
+    console.log("hi2")
   }
 
   zoomOut() {
@@ -132,6 +137,7 @@ export default class OpenHouseMap extends React.Component {
             onMouseOver= {this.onMarkerMouseOver}
             onMouseOut= {this.onMarkerMouseOut}
             markerClass= {"map-marker"}
+            onZoom= {this.onZoom}
           />          
         <ZoomControl
           zoomInClick= {this.zoomIn}
