@@ -7,6 +7,7 @@ import DataView from './DataView'
 import Footer from './Footer'
 
 import $ from 'jquery'
+import _ from 'lodash'
 
 export default class App extends React.Component {
 
@@ -42,10 +43,10 @@ export default class App extends React.Component {
 			numCalls: 0,
 			changed: false,
 			busy: false,
-			curl: '',
 			searchCriteria: searchCriteria
 		}
 		this.tick = this.tick.bind(this)
+		this.curlRequest = this.curlRequest.bind(this)
 		this.addNewProperties = this.addNewProperties.bind(this)
 		this.updateSearchCriteria = this.updateSearchCriteria.bind(this)
 	}
@@ -62,15 +63,15 @@ export default class App extends React.Component {
 		only when the user has finished changing a slider component
 	*/
 	updateSearchCriteria(ncriteria) {
-		var criteria = this.state
+		var uSearchCriteria = _.extend({}, this.state.searchCriteria);
 		var keys = Object.keys(ncriteria)
 		for (var i=0; i < keys.length; i++) {
 			var key = keys[i]
 			var range = ncriteria[key]
-			var sc = criteria.searchCriteria
-			sc[key] = range
+			uSearchCriteria[key] = range
 		}
-		this.setState({criteria: criteria, offset: 0, count: 1})
+		var nstate = {searchCriteria: uSearchCriteria, offset: 0, count: 1}
+		this.setState(nstate)
 		// TODO: update from cache
 		// TODO: update ajax
 	}
@@ -95,23 +96,27 @@ export default class App extends React.Component {
 	    results = readPropertiesFromLocalStorage(bbox, this.filters)
 	    */
 	}
+	curlRequest() {
+		var searchCriteria = this.state.searchCriteria
+		var minprice = searchCriteria.price[0]
+		var maxprice = searchCriteria.price[1]
+		var minbed = searchCriteria.bedrooms[0]
+		var maxbed = searchCriteria.bedrooms[1]
+		var minbath = searchCriteria.bathrooms[0]
+		var maxbath = searchCriteria.bathrooms[1]
+		var minsqft = searchCriteria.sqft[0]
+		var maxsqft = searchCriteria.sqft[1]
+		var curl = `http://api.openhouseproject.co/api/property/?min_price=${minprice}&max_price=${maxprice}&min_bedrooms=${minbed}&max_bedrooms=${maxbed}&min_bathrooms=${minbath}&max_bathrooms=${maxbath}&min_building_size=${minsqft}&max_building_size=${maxsqft}`
+		return curl
+	}
 	tick() {
 		if (!this.state.busy) {
 			var offset = this.state.offset
 			var limit = this.state.limit
 			var count = this.state.count
-			var minprice = this.state.searchCriteria.price[0]
-			var maxprice = this.state.searchCriteria.price[1]
-			var minbed = this.state.searchCriteria.bedrooms[0]
-			var maxbed = this.state.searchCriteria.bedrooms[1]
-			var minbath = this.state.searchCriteria.bathrooms[0]
-			var maxbath = this.state.searchCriteria.bathrooms[1]
-			var minsqft = this.state.searchCriteria.sqft[0]
-			var maxsqft = this.state.searchCriteria.sqft[1]
 			if (offset < count) {
-				var curl = `http://api.openhouseproject.co/api/property/?min_price=${minprice}&max_price=${maxprice}&min_bedrooms=${minbed}&max_bedrooms=${maxbed}&min_bathrooms=${minbath}&max_bathrooms=${maxbath}&min_building_size=${minsqft}&max_building_size=${maxsqft}`
+				var curl = this.curlRequest()
 				var url = curl + `&limit=${limit}&offset=${offset}`
-				this.setState({busy: true, curl: curl})
 				var me = this
 				$.ajax({
 				  url: url,
@@ -129,9 +134,10 @@ export default class App extends React.Component {
 	}
 
 	render() {
+		var curlRequestFn = this.curlRequest
 	    return (<div>
 	    		  <Header />
-	    		  <Controls count={this.state.count} offset={this.state.offset} busy={this.state.busy} curl={this.state.curl} changed={this.state.changed} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
+	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
 	    		  <DataView listings={this.state.listings} />
 	    		  <Footer />
 	           </div>)
