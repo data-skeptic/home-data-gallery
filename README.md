@@ -16,6 +16,16 @@ This repo is a Node.js webapp with React.js.  It retrieves data via the OpenHous
 * Fix a bug or implement a features, and then make a pull request.
 * If all else fails, reach out to kyle@dataskeptic.com for help getting involved.
 
+## Steps to contribute to this codebase:
+1. Create a feature branch
+2. Make your changes and push
+3. Submit a pull request from your feature branch to dev
+4. Remind us on slack that you did a PR
+5. Wait for the PR to be reviewed/merged
+6. Check the URL above to see your changes live
+7. All things going well, we’ll then merge to master which will deploy to `gallery.openhouseproject.co` (that step not fully implemented yet)
+
+
 ## Running in Dev
 1. `npm install`
 1. In one terminal tab `npm run watch` alias for `webpack --watch`
