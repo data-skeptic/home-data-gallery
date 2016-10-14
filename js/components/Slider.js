@@ -19,7 +19,7 @@ export default class Slider extends React.Component {
 
 	onUpdate(event) {
 		var input = event.target
-		console.log(event)
+		//console.log(event)
 	}
 
 	render() {
