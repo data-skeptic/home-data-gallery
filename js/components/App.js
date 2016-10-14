@@ -5,29 +5,28 @@ import Header from './Header'
 import Controls from './Controls'
 import DataView from './DataView'
 import Footer from './Footer'
+import LocalStorageIO from './LocalStorageIO'
 
 import $ from 'jquery'
 import _ from 'lodash'
+
+const localStorageIO = new LocalStorageIO()
+//localStorageIO.clearLocalStorage()
 
 export default class App extends React.Component {
 
 	constructor(props) {
 		super(props)
 
-		var listings = [
-		  {
-		  	listing_timestamp: "Loading...",
-		  	listing_type: "Loading...",
-		  	price: "Loading...",
-		  	bedrooms: "Loading...",
-		  	bathrooms: "Loading...",
-		  	car_spaces: "Loading...",
-		  	building_size: "Loading...",
-		  	land_size: "Loading...",
-		  	size_units: "Loading...",
-		  	address: "Loading..."
-		  }
-		];
+		var viewport = {
+			top: 57.66,
+			left: -136.85,
+			bottom: 14.01,
+			right: 14.01
+		}
+		var filters = {}
+		var listings = localStorageIO.readPropertiesFromLocalStorage(viewport, filters) 
+
 		var searchCriteria = {
 			price: [0, 1000000],
 			bedrooms: [0, 8],
@@ -45,6 +44,7 @@ export default class App extends React.Component {
 			busy: false,
 			searchCriteria: searchCriteria
 		}
+
 		this.tick = this.tick.bind(this)
 		this.curlRequest = this.curlRequest.bind(this)
 		this.addNewProperties = this.addNewProperties.bind(this)
@@ -72,6 +72,7 @@ export default class App extends React.Component {
 		}
 		var nstate = {searchCriteria: uSearchCriteria, offset: 0, count: 1}
 		this.setState(nstate)
+		var matches = localStorageIO.readPropertiesFromLocalStorage(viewport, filters) 
 		// TODO: update from cache
 		// TODO: update ajax
 	}
@@ -86,10 +87,10 @@ export default class App extends React.Component {
 			busy = false
 		}
 		this.setState({count, offset, busy, listings})
-		// TODO: import kd tree and do eviction
+		// TODO: do eviction
 		// TODO: Do filtering
+		localStorageIO.writeLocalStorage(resp)
 	  	/*
-	    writeLocalStorage(resp) // localStorageIO.js
 	    var bounds = map.getExtent().clone()
 	    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
 	    this.filters = get_request()
