@@ -5,106 +5,78 @@ import BarComp from './BarComp'
 import ScatterComp from './ScatterComp'
 
 export default class Plots extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {      
+	constructor(props) {
+    	super(props)
+    	this.state = {}
+    	console.log("initializing plots")
+		this.getPriceData = this.getPriceData.bind(this)
+		this.getScatterData = this.getScatterData.bind(this)
     }
-    console.log("initializing plots")
-  }
-  render() {
-	var barData1 = [
-		{
-		    "name": "91130",
-		    "values": [
-		      { "x": 0, "y": 0},
-		      { "x": 100000, "y": 314},
-		      { "x": 200000, "y": 138},
-		      { "x": 300000, "y": 0},
-		      { "x": 400000, "y": 0},
-		      { "x": 500000, "y": 0},
-		      { "x": 600000, "y": 0},
-		      { "x": 700000, "y": 0},
-		      { "x": 800000, "y": 0},
-		      { "x": 900000, "y": 0},
-		      { "x": 1000000, "y": 0},
-		      { "x": 1100000, "y": 0},
-		      { "x": 1200000, "y": 0},
-		      { "x": 1300000, "y": 0},
-		      { "x": 1400000, "y": 0},
-		      { "x": 1500000, "y": 0},
-		      { "x": 1600000, "y": 0},
-		      { "x": 1700000, "y": 1},
-		    ]
-		}
-	];
-	var barData2 = [
-		{
-		"name": "91130",
-		"values": [
-			{ "x": 0, "y": 0},
-			{ "x": 100000, "y": 314},
-			{ "x": 200000, "y": 138},
-			{ "x": 300000, "y": 0},
-			{ "x": 400000, "y": 0},
-			{ "x": 500000, "y": 0},
-			{ "x": 600000, "y": 0},
-			{ "x": 700000, "y": 0},
-			{ "x": 800000, "y": 0},
-			{ "x": 900000, "y": 0},
-			{ "x": 1000000, "y": 0},
-			{ "x": 1100000, "y": 0},
-			{ "x": 1200000, "y": 0},
-			{ "x": 1300000, "y": 0},
-			{ "x": 1400000, "y": 0},
-			{ "x": 1500000, "y": 0},
-			{ "x": 1600000, "y": 0},
-			{ "x": 1700000, "y": 1},
+  	getPriceData(listings, col, buckets) {
+		var priceData = [
+			{
+			    "name": "",
+			    "values": []
+			}
 		]
+		for (var i=0; i < buckets.length; i++) {
+			priceData[0]["values"].push({"x": buckets[i], "y": 0})
 		}
-	];
-	var scatterData1 = [
-		{
-			name: "series1",
-			values: [ { x: 110, y: 20 }, { x: 150, y: 71 }, { x: 800, y: 32 }, { x: 1300, y: 33 }, { x: 1200, y: 10 }, { x: 1310, y: 15 }, { x: 2410, y: 18 }, { x: 2510, y: 15 }, { x: 1610, y: 12 }, { x: 1630, y: 32 }, { x: 1930, y: 30 }, { x: 1477, y: 30 }]
-		}
-	];
-
-	return (
-		<div className="Plots">
-			<div className="Plot-header">
-				<h2>Plots</h2>
-				<BarComp
-					data={barData1}
-					width={500}
-					height={300}
-					title="Price Histogram"
-					xAxisLabel="Price Bins"
-					yAxisLabel="No. Properties"
-				/>
-				<BarComp
-					data={barData2}
-					width={500}
-					height={300}
-					title="Price Histogram"
-					xAxisLabel="Price Bins"
-					yAxisLabel="No. Properties"
-				/>
-				<ScatterComp
-					data={scatterData1}
-					width={500}
-					height={400}
-					title="Scatter Chart"
-					xAxisLabel="Price ($K)"
-					yAxisLabel="Area (Sqrt Ft)"
-					domain={{x:[-15,], y:[-15,]}}
-				/>
+    	for (var i=0; i < listings.length; i++) {
+	    	var listing = listings[i]
+	    	var value = listing[col]
+	     	if (value != undefined) {
+				var bin = buckets.map(function(b) { return (value > b)+0 })
+								.reduce( (prev, curr) => prev + curr )
+				priceData[0]["values"][bin-1]["y"] = priceData[0]["values"][bin-1]["y"] + 1
+        	}
+        }
+        return priceData
+	}
+	getScatterData(listings, col1, col2) {
+		var data = [
+			{
+				name: "",
+				values: []
+			}
+		];
+    	for (var i=0; i < listings.length; i++) {
+	    	var listing = listings[i]
+	    	var x = listing[col1]
+	    	var y = listing[col2]
+	    	data[0]["values"].push({x: x, y: y})
+	    }
+		return data
+	}
+	render() {
+		var buckets = [0, 100000, 200000, 300000, 400000, 500000, 750000, 1000000, 10000000, 100000000]
+  		var priceData = this.getPriceData(this.props.listings, "price", buckets)
+		var scatterData = this.getScatterData(this.props.listings, "price", "building_size")
+		return (
+			<div className="Plots">
+				<div className="Plot-header">
+					<h2>Plots</h2>
+					<BarComp
+						data={priceData}
+						width={500}
+						height={300}
+						title="Price Histogram"
+						xAxisLabel="Price Bins"
+						yAxisLabel="No. Properties"
+					/>
+					<ScatterComp
+						data={scatterData}
+						width={500}
+						height={400}
+						title="Price vs. sqft"
+						xAxisLabel="Price ($K)"
+						yAxisLabel="Area (Sqrt Ft)"
+						domain={{x:[-15,], y:[-15,]}}
+					/>
+				</div>
 			</div>
-			<p className="App-intro">
-				Edit <code>component/Plots.js</code> and save to reload.
-			</p>
-		</div>
-    );
-  }
+    	)
+	}
 }
 
 /*
