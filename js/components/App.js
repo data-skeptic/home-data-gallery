@@ -38,18 +38,20 @@ export default class App extends React.Component {
 			listings: listings,
 			waiting: false,
 			count: 1,
-			limit: 5,
+			limit: 500,
 			offset: 0,
 			numCalls: 0,
 			changed: false,
 			busy: false,
-			searchCriteria: searchCriteria
+			searchCriteria: searchCriteria,
+			viewport: viewport
 		}
 
 		this.tick = this.tick.bind(this)
 		this.curlRequest = this.curlRequest.bind(this)
 		this.addNewProperties = this.addNewProperties.bind(this)
 		this.updateSearchCriteria = this.updateSearchCriteria.bind(this)
+		this.setViewport = this.setViewport.bind(this)
 	}
 	componentDidMount() {
 		this.timer = setInterval(this.tick, 1000)
@@ -80,24 +82,18 @@ export default class App extends React.Component {
 	addNewProperties(resp) {
 		var listings = resp["results"]
 		var count = resp['count']
-		var offset = resp['results'].length
-		// TODO: Better forward crawling management
-		var busy = true
+		var offset = this.state.offset + resp['results'].length
 		if (true) { // This line tells it to give up after 1 call, good for development
 			offset = count
-			busy = false
-		}
-		var viewport = {
-			top: 57.66,
-			left: -136.85,
-			bottom: 14.01,
-			right: 14.01
 		}
 		var filters = {}
-		var listings = localStorageIO.readPropertiesFromLocalStorage(viewport, filters) 
+		var listings = localStorageIO.readPropertiesFromLocalStorage(this.state.viewport, filters) 
 		localStorageIO.writeLocalStorage(resp)
-		listings = localStorageIO.readPropertiesFromLocalStorage(viewport, filters) 
-		this.setState({count, offset, busy, listings})
+		listings = localStorageIO.readPropertiesFromLocalStorage(this.state.viewport, filters) 
+		var s3 = new Date().getTime()
+		this.setState({count, offset, listings})
+		var s4 = new Date().getTime()
+		console.log(['slow run:', s4-s3])
 		// TODO: do eviction
 		// TODO: Do filtering
 	  	/*
@@ -106,6 +102,10 @@ export default class App extends React.Component {
 	    this.filters = get_request()
 	    results = readPropertiesFromLocalStorage(bbox, this.filters)
 	    */
+	}
+	setViewport(viewport) {
+		console.log(viewport)
+		this.setState({viewport})
 	}
 	curlRequest() {
 		var searchCriteria = this.state.searchCriteria
@@ -117,6 +117,7 @@ export default class App extends React.Component {
 		var maxbath = searchCriteria.bathrooms[1]
 		var minsqft = searchCriteria.sqft[0]
 		var maxsqft = searchCriteria.sqft[1]
+		// TODO: close_by
 		var curl = `http://api.openhouseproject.co/api/property/?min_price=${minprice}&max_price=${maxprice}&min_bedrooms=${minbed}&max_bedrooms=${maxbed}&min_bathrooms=${minbath}&max_bathrooms=${maxbath}&min_building_size=${minsqft}&max_building_size=${maxsqft}`
 		return curl
 	}
@@ -126,6 +127,7 @@ export default class App extends React.Component {
 			var limit = this.state.limit
 			var count = this.state.count
 			if (offset < count) {
+				this.setState({busy: true})
 				var curl = this.curlRequest()
 				var url = curl + `&limit=${limit}&offset=${offset}`
 				var me = this
@@ -139,6 +141,7 @@ export default class App extends React.Component {
 				  	me.setState({"network_ok": false})
 				  }
 				})
+				this.setState({busy: false})
 			}
 		}
 	}
@@ -148,7 +151,7 @@ export default class App extends React.Component {
 	    return (<div>
 	    		  <Header />
 	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} network_ok={this.state.network_ok} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
-	    		  <DataView listings={this.state.listings} />
+	    		  <DataView setViewport={this.setViewport} listings={this.state.listings} />
 	    		  <Footer />
 	           </div>)
 	}
