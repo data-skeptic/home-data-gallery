@@ -40,6 +40,7 @@ export default class Controls extends React.Component {
           			<Slider title='sq.ft.' min_value={0} max_value={10000} low={this.props.searchCriteria.sqft[0]} high={this.props.searchCriteria.sqft[1]} onUpdate={this.onUpdate.bind(this, 'sqft')} />
               </div>
               <div id='controls-right'>
+              {this.props.network_ok ? "": "Network issues!"}
                 <p>Loading: {this.props.offset}/{this.props.count}</p>
                 {this.props.busy | this.props.changed ? <img src="box.gif" width="60" />: ""}
                 <div id='curlBox'>
