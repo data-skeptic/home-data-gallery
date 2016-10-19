@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import { Map, MarkerGroup } from "react-d3-map"
-import { ZoomControl } from "react-d3-map-core"
+import { ZoomControl, projection } from "react-d3-map-core"
 
 import Marker from './Marker'
 
@@ -10,13 +10,11 @@ export default class OpenHouseMap extends React.Component {
   constructor(props) {
   	super(props)
   	this.state = {
-  		lat: -100.95,
+  		lat: -100.95,     // TODO: revisit if these should store here or in mmap
   		lng: 40.7,
   		scale: (1 << 12),
       selected: undefined
   	}
-    this.onChange = this.onChange.bind(this)
-    this.onZoom = this.onZoom.bind(this)
     this.zoomIn = this.zoomIn.bind(this)
     this.zoomOut = this.zoomOut.bind(this)
     this.popupContent = this.popupContent.bind(this)
@@ -31,14 +29,24 @@ export default class OpenHouseMap extends React.Component {
 
   updateDimensions() {
     console.log("Update viewport")
-    console.log([this.state.lat, this.state.lng, this.state.scale])
     var mmap = this.state.mmap
     if (mmap != undefined) {
-      console.log("mmap")
-      console.log(mmap)
+      var zt = mmap.state.zoomTranslate
+      console.log([zt[0], zt[1], mmap.state.scaleSet])
+      // projection
       var nscale = this.state.mmap.state.scaleSet
-      console.log(this.state.mmap.state.zoomTranslate)
-      this.setState({scale: nscale})
+      var me = this
+      var fn = this.state.mmap.projection.invert
+      var nll = fn(zt)
+      console.log(nll)
+      setTimeout(function() {
+        console.log("compare to")
+        var fn = me.state.mmap.projection.invert
+        var nll = fn(zt)
+        console.log(zt)
+        console.log(nll)
+      }, 500);
+      //this.setState({"lat": nll[0], "lng": nll[1], "scale": nscale})
     }
   }
 
@@ -49,26 +57,26 @@ export default class OpenHouseMap extends React.Component {
     window.addEventListener("click", this.updateDimensions)
   }
 
-  onChange() {
-    console.log("hi")
-  }
-
-  onZoom() {
-    console.log("hi2")
+  onZoom(onZoomScale, onZoomTranslate) {
+    console.log("hi2zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
+    this.setState({
+      scaleSet: onZoomScale,
+      zoomTranslate: onZoomTranslate
+    })
   }
 
   zoomOut() {
-    console.log("zo")
-    this.setState({
-      scale: this.state.scale / 2
-    })
+    console.log('zo')
+    var newScale = this.state.scale / 2
+    this.setState({scale: newScale})
+    this.state.mmap.setState({'scaleSet': newScale})
   }
 
   zoomIn() {
-    console.log("zi")
-    this.setState({
-      scale: this.state.scale * 2
-    })
+    console.log('zi')
+    var newScale = this.state.scale * 2
+    this.setState({scale: newScale})
+    this.state.mmap.setState({'scaleSet': newScale})
   }
 
   popupContent(d) { return d.properties.name; }
@@ -98,6 +106,7 @@ export default class OpenHouseMap extends React.Component {
   }
 
   render() {
+    console.log("render")
     var data = {"type":"FeatureCollection","features":[]}
     var listings = this.props.listings
     for (var i=0; i < listings.length; i++) {
@@ -116,9 +125,10 @@ export default class OpenHouseMap extends React.Component {
     var width = 400
     var height = 300
     var scaleExtent = [1 << 10, 1 << 14]
-    const position = [this.state.lat, this.state.lng];
-    console.log("scale:")
-    console.log(this.state.scale)
+    var mmap = this.state.mmap
+    var p = [this.state.lat, this.state.lng]
+    const position = p
+    var onZoom = this.onZoom.bind(this);
     return (
       <div>
         <Map
@@ -127,6 +137,7 @@ export default class OpenHouseMap extends React.Component {
           scale= {this.state.scale}
           scaleExtent= {scaleExtent}
           center= {position}
+          onZoom= {onZoom}
           ref={(ref) => this.state.mmap = ref} >
           <MarkerGroup
             key= {"polygon-test"}
@@ -137,7 +148,6 @@ export default class OpenHouseMap extends React.Component {
             onMouseOver= {this.onMarkerMouseOver}
             onMouseOut= {this.onMarkerMouseOut}
             markerClass= {"map-marker"}
-            onZoom= {this.onZoom}
           />          
         <ZoomControl
           zoomInClick= {this.zoomIn}

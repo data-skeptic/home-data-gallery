@@ -34,6 +34,7 @@ export default class App extends React.Component {
 			sqft: [100, 4000],
 		}
 		this.state = {
+			network_ok: true,
 			listings: listings,
 			waiting: false,
 			count: 1,
@@ -86,10 +87,19 @@ export default class App extends React.Component {
 			offset = count
 			busy = false
 		}
+		var viewport = {
+			top: 57.66,
+			left: -136.85,
+			bottom: 14.01,
+			right: 14.01
+		}
+		var filters = {}
+		var listings = localStorageIO.readPropertiesFromLocalStorage(viewport, filters) 
+		localStorageIO.writeLocalStorage(resp)
+		listings = localStorageIO.readPropertiesFromLocalStorage(viewport, filters) 
 		this.setState({count, offset, busy, listings})
 		// TODO: do eviction
 		// TODO: Do filtering
-		localStorageIO.writeLocalStorage(resp)
 	  	/*
 	    var bounds = map.getExtent().clone()
 	    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
@@ -126,8 +136,7 @@ export default class App extends React.Component {
 				  dataType: 'json',
 				  success: this.addNewProperties,
 				  error: function (xhr, ajaxOptions, thrownError) {
-				    console.log(thrownError)
-				    //api.busy = false
+				  	me.setState({"network_ok": false})
 				  }
 				})
 			}
@@ -138,7 +147,7 @@ export default class App extends React.Component {
 		var curlRequestFn = this.curlRequest
 	    return (<div>
 	    		  <Header />
-	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
+	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} network_ok={this.state.network_ok} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
 	    		  <DataView listings={this.state.listings} />
 	    		  <Footer />
 	           </div>)

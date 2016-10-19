@@ -30,7 +30,7 @@ export default class {
 		localStorage.clear()
 	}
 
-	distance(a, b){
+	distance(a, b) {
 	  return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2);
 	}
 
@@ -162,6 +162,8 @@ export default class {
 		  		var elem = data[i]
 				if (elem['address_object'] != undefined) {
 			        var toCache = elem
+			        toCache["latitude"] = toCache['address_object']['latitude']
+			        toCache["longitude"] = toCache['address_object']['longitude']
 
 			        // Save data element to cache by element id
 			        var point = {"latitude": toCache['address_object']['latitude'], "longitude": toCache['address_object']['longitude']}
