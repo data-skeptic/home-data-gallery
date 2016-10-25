@@ -20,7 +20,7 @@ export default class {
 	readLocalStorage(id) {
 		var elem = localStorage.getItem(id)
 		if (elem != undefined) {
-		elem = JSON.parse(elem)
+			elem = JSON.parse(elem)
 		}
 		return elem
 	}
@@ -98,8 +98,8 @@ export default class {
 		var clat = (lat1 - lat2)/2 + lat2
 		var clon = (lon1 - lon2)/2 + lon2
 		var radius_miles = this.haversineDistance({"latitude": clat, "longitude": clon}, {"latitude": lat2, "longitude": lon2})
-		// TODO: revisit this 9999
-		var kdmatches = this.tree.nearest({"latitude": clat, "longitude": clon}, 9999, radius_miles)
+		// TODO: revisit this 500
+		var kdmatches = this.tree.nearest({"latitude": clat, "longitude": clon}, 500, radius_miles)
 
 		var cmatches = []
 		for (var i=0; i < kdmatches.length; i++) {

@@ -127,6 +127,7 @@ export default class App extends React.Component {
 			var limit = this.state.limit
 			var count = this.state.count
 			if (offset < count) {
+				console.log("go")
 				this.setState({busy: true})
 				var curl = this.curlRequest()
 				var url = curl + `&limit=${limit}&offset=${offset}`
@@ -136,12 +137,14 @@ export default class App extends React.Component {
 				  type: 'GET',
 				  contentType: 'text/json',
 				  dataType: 'json',
-				  success: this.addNewProperties,
+				  success: function (resp) {
+				  	me.setState({busy: false})
+					me.addNewProperties(resp)
+				  },
 				  error: function (xhr, ajaxOptions, thrownError) {
-				  	me.setState({"network_ok": false})
+				  	me.setState({network_ok: false, busy: false})
 				  }
 				})
-				this.setState({busy: false})
 			}
 		}
 	}
