@@ -5,16 +5,19 @@ import { ZoomControl, projection } from "react-d3-map-core"
 
 import Marker from './Marker'
 
+const iscale = (1 << 11)
+const iposition = [-100.95, 40.7]
+
 export default class OpenHouseMap extends React.Component {
   
   constructor(props) {
   	super(props)
   	this.state = {
-  		lat: -100.95,     // TODO: revisit if these should store here or in mmap
-  		lng: 40.7,
-  		scale: (1 << 12),
+      position: iposition,
+      scale: iscale,
       selected: undefined
   	}
+    this.setViewport = props.setViewport
     this.zoomIn = this.zoomIn.bind(this)
     this.zoomOut = this.zoomOut.bind(this)
     this.popupContent = this.popupContent.bind(this)
@@ -22,61 +25,41 @@ export default class OpenHouseMap extends React.Component {
     this.onMarkerMouseOver = this.onMarkerMouseOver.bind(this)
     this.onMarkerClick = this.onMarkerClick.bind(this)
     this.onMarkerCloseClick = this.onMarkerCloseClick.bind(this)
-    this.componentWillMount = this.componentWillMount.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
     this.updateDimensions = this.updateDimensions.bind(this)
   }
 
   updateDimensions() {
-    console.log("Update viewport")
     var mmap = this.state.mmap
+    console.log(mmap)
     if (mmap != undefined) {
+      var w = mmap.props.width
+      var h = mmap.props.height
       var zt = mmap.state.zoomTranslate
-      console.log([zt[0], zt[1], mmap.state.scaleSet])
-      // projection
-      var nscale = this.state.mmap.state.scaleSet
-      var me = this
-      var fn = this.state.mmap.projection.invert
-      var nll = fn(zt)
-      console.log(nll)
-      setTimeout(function() {
-        console.log("compare to")
-        var fn = me.state.mmap.projection.invert
-        var nll = fn(zt)
-        console.log(zt)
-        console.log(nll)
-      }, 500);
-      //this.setState({"lat": nll[0], "lng": nll[1], "scale": nscale})
+      if (zt == undefined || zt.length != 2) {
+        console.log(["Got bad value for zoomTranslate", zt])
+      }
+      else {
+        var c = mmap.projection.invert([zt[1], zt[0]])
+        var ul = mmap.projection.invert([zt[1] - w/2, zt[0] - h/2])
+        var lr = mmap.projection.invert([zt[1] + w/2, zt[0] + h/2])
+        var viewport = {"top": ul[1], "bottom": lr[1], "left": ul[0], "right": lr[0]}
+        this.setState({position: c})
+        this.setViewport({viewport: viewport})
+        mmap.setState({center: c})
+      }
     }
-  }
-
-  componentWillMount() {
-    this.updateDimensions()
   }
   componentDidMount() {
     window.addEventListener("click", this.updateDimensions)
   }
 
-  onZoom(onZoomScale, onZoomTranslate) {
-    console.log("hi2zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
-    this.setState({
-      scaleSet: onZoomScale,
-      zoomTranslate: onZoomTranslate
-    })
-  }
-
   zoomOut() {
-    console.log('zo')
-    var newScale = this.state.scale / 2
-    this.setState({scale: newScale})
-    this.state.mmap.setState({'scaleSet': newScale})
+    this.setState({scale: this.state.scale / 2})
   }
 
   zoomIn() {
-    console.log('zi')
-    var newScale = this.state.scale * 2
-    this.setState({scale: newScale})
-    this.state.mmap.setState({'scaleSet': newScale})
+    this.setState({scale: this.state.scale * 2})
   }
 
   popupContent(d) { return d.properties.name; }
@@ -106,7 +89,6 @@ export default class OpenHouseMap extends React.Component {
   }
 
   render() {
-    console.log("render")
     var data = {"type":"FeatureCollection","features":[]}
     var listings = this.props.listings
     for (var i=0; i < listings.length; i++) {
@@ -125,19 +107,19 @@ export default class OpenHouseMap extends React.Component {
     var width = 400
     var height = 300
     var scaleExtent = [1 << 10, 1 << 14]
-    var mmap = this.state.mmap
-    var p = [this.state.lat, this.state.lng]
-    const position = p
-    var onZoom = this.onZoom.bind(this);
+    var position = iposition
+    var scale = iscale
+    var zoomIn = this.zoomIn
+    var zoomOut = this.zoomOut
     return (
       <div>
         <Map
           width= {width}
           height= {height}
-          scale= {this.state.scale}
-          scaleExtent= {scaleExtent}
+          scale= {scale}
+          zoomScale= {this.state.scale}
           center= {position}
-          onZoom= {onZoom}
+          scaleExtent= {scaleExtent}
           ref={(ref) => this.state.mmap = ref} >
           <MarkerGroup
             key= {"polygon-test"}
@@ -150,8 +132,8 @@ export default class OpenHouseMap extends React.Component {
             markerClass= {"map-marker"}
           />          
         <ZoomControl
-          zoomInClick= {this.zoomIn}
-          zoomOutClick= {this.zoomOut}
+          zoomInClick= {zoomIn}
+          zoomOutClick= {zoomOut}
         />      
         </Map>
         <Marker listing={this.state.selected}>

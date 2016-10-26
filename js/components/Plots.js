@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
+import Carousel from 'nuka-carousel'
+
 import BarComp from './BarComp'
 import ScatterComp from './ScatterComp'
 
@@ -53,26 +55,26 @@ export default class Plots extends Component {
   		var priceData = this.getPriceData(this.props.listings, "price", buckets)
 		var scatterData = this.getScatterData(this.props.listings, "price", "building_size")
 		return (
-			<div className="Plots">
+			<div class="Plots">
 				<div className="Plot-header">
-					<h2>Plots</h2>
-					<BarComp
-						data={priceData}
-						width={500}
-						height={300}
-						title="Price Histogram"
-						xAxisLabel="Price Bins"
-						yAxisLabel="No. Properties"
-					/>
-					<ScatterComp
-						data={scatterData}
-						width={500}
-						height={400}
-						title="Price vs. sqft"
-						xAxisLabel="Price ($K)"
-						yAxisLabel="Area (Sqrt Ft)"
-						domain={{x:[-15,], y:[-15,]}}
-					/>
+					<Carousel autoplay={true} >
+						<BarComp
+							data={priceData}
+							class="Plot"
+							title="Price Histogram"
+							xAxisLabel="Price Bins"
+							yAxisLabel="No. Properties"
+						/>
+						<ScatterComp
+							data={scatterData}
+							className="Plot"
+							title="Price vs. sqft"
+							xAxisLabel="Price ($K)"
+							yAxisLabel="Area (Sqrt Ft)"
+							domain={{x:[-15,], y:[-15,]}}
+						/>
+					</Carousel>
+
 				</div>
 			</div>
     	)
