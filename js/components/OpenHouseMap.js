@@ -31,6 +31,7 @@ export default class OpenHouseMap extends React.Component {
 
   updateDimensions() {
     var mmap = this.state.mmap
+    console.log(mmap)
     if (mmap != undefined) {
       var w = mmap.props.width
       var h = mmap.props.height

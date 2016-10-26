@@ -13,8 +13,6 @@ export default class BarComp extends React.Component {
 	return (<div>
 		      <BarChart
 			      data={this.props.data}
-			      width={this.props.width}
-			      height={this.props.height}
 			      title={this.props.title}
 			      xAxisLabel={this.props.xAxisLabel}
 			      yAxisLabel={this.props.yAxisLabel}

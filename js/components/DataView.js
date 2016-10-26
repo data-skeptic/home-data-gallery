@@ -12,10 +12,21 @@ export default class DataView extends React.Component {
 	}
 
 	render() {
-	    return (<div id="tabs">
-	    			<OpenHouseMap listings={this.props.listings} setViewport={this.props.setViewport} />
-	    			<Plots listings={this.props.listings} />
-	    			<DataTable listings={this.props.listings} />
-	           </div>)
+	    return (
+	    		<div id="tabs">
+	    			<div id="rowOne">
+	    				<div id="rowOneLeft">
+	    					<OpenHouseMap listings={this.props.listings} setViewport={this.props.setViewport} />
+	    				</div>
+	    				<div id="rowOneRight">
+	    					<Plots listings={this.props.listings} />
+						</div>
+	    			</div>
+					<div class="clear"></div>
+	    			<div>
+		    			<DataTable listings={this.props.listings} />
+	    			</div>
+	           </div>
+	    )
 	}
 }

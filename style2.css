@@ -1,18 +1,18 @@
 /*********************************************************
-	WHOLE PAGE
+  WHOLE PAGE
 **********************************************************/
 
 body {
-	margin: 0px;
+  margin: 0px;
 }
 
 
 /*********************************************************
-	TOP SECTION OF PAGE
+  TOP SECTION OF PAGE
 **********************************************************/
 
 #header {
-  background-color: #ddd;
+  background-color: #333;
   clear: both;
 }
 
@@ -24,24 +24,49 @@ body {
 }
 
 #controls-left {
-	float: left;
-	padding: 5px;
+  float: left;
+  padding: 5px;
 }
+
+#controls-right {
+  overflow: hidden;
+  height: 90px;
+}
+
 #controls-center {
-	float: left;
-	padding: 5px;
+  float: left;
+  padding: 5px;
 }
 
 #logo {
-	float:left;
+  float:left;
 }
 
 #logo-img {
-	height: 20px;
+  height: 20px;
 }
 
 #title {
-	margin-left: 30px;
+  margin-left: 30px;
+  color: #eee;
+  font-weight: bold;
+}
+
+#rowOneLeft {
+}
+
+#rowOneRight {
+  min-width: 300px;
+  width: 50%;
+}
+
+#rowOne {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  width: 100%;
+  flex-flow: row wrap;
 }
 
 .btn {
@@ -63,7 +88,7 @@ body {
 }
 
 /*********************************************************
-	DATA TABLE
+  DATA TABLE
 **********************************************************/
 
 .jsonTable {
@@ -93,29 +118,22 @@ body {
 }
 
 /*********************************************************
-	MAP
+  MAP
 **********************************************************/
-
-.leaflet-container {
-    height: 50px;
-    width: 100px;
-}
-.ohmap {
-  width:100px;
-}
-
-.map-marker {
-  
-}
 
 .map-listing-detail-title {
   font-weight: bold;
 }
 
 /*********************************************************
-	PLOTS
+  PLOTS
 **********************************************************/
 
+
+#Plot {
+  margin: 10px;
+  background-color: #f00;
+}
 
 
 
@@ -134,7 +152,7 @@ body {
 
 
 /*********************************************************
-	SLIDER
+  SLIDER
 **********************************************************/
 
 .slider {

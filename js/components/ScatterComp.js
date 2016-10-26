@@ -13,8 +13,6 @@ export default class ScatterComp extends React.Component {
 	return (<div>
 				<ScatterChart
 				data={this.props.data}
-				width={this.props.width}
-				height={this.props.height}
 				title={this.props.title}
 				xAxisLabel={this.props.xAxisLabel}
 				yAxisLabel={this.props.yAxisLabel}
