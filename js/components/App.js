@@ -151,11 +151,25 @@ export default class App extends React.Component {
 
 	render() {
 		var curlRequestFn = this.curlRequest
-	    return (<div>
-	    		  <Header />
-	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} network_ok={this.state.network_ok} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
-	    		  <DataView setViewport={this.setViewport} listings={this.state.listings} />
-	    		  <Footer />
-	           </div>)
+		return (<div>
+			<Header />
+			<div class="container">
+				<Controls
+					curlRequestFn={curlRequestFn}
+					count={this.state.count}
+					offset={this.state.offset}
+					busy={this.state.busy}
+					changed={this.state.changed}
+					network_ok={this.state.network_ok}
+					searchCriteria={this.state.searchCriteria}
+					updateSearchCriteria={this.updateSearchCriteria.bind(this)}
+				/>
+				<DataView
+					setViewport={this.setViewport}
+					listings={this.state.listings}
+				/>
+			</div>
+			<Footer />
+		</div>)
 	}
 }
