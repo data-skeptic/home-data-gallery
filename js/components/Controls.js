@@ -30,16 +30,16 @@ export default class Controls extends React.Component {
 	render() {
     var curl = this.state.curlRequestFn()
     this.state.value = curl
-  	return (<div id="controls">
-              <div id='controls-left'>
+  	return (<div id="controls" class="row">
+              <div class="col-sm-3">
           			<Slider title='Beds' min_value={0} max_value={10} low={this.props.searchCriteria.bedrooms[0]} high={this.props.searchCriteria.bedrooms[1]} onUpdate={this.onUpdate.bind(this, 'bedrooms')} />
           			<Slider title='Bath' min_value={0} max_value={10} low={this.props.searchCriteria.bathrooms[0]} high={this.props.searchCriteria.bathrooms[1]} onUpdate={this.onUpdate.bind(this, 'bathrooms')} />
               </div>
-              <div id='controls-center'>
+              <div class="col-sm-3">
           			<Slider title='Price' min_value={0} max_value={100000000} low={this.props.searchCriteria.price[0]} high={this.props.searchCriteria.price[1]} onUpdate={this.onUpdate.bind(this, 'price')} />
           			<Slider title='sq.ft.' min_value={0} max_value={10000} low={this.props.searchCriteria.sqft[0]} high={this.props.searchCriteria.sqft[1]} onUpdate={this.onUpdate.bind(this, 'sqft')} />
               </div>
-              <div id='controls-right'>
+              <div class="col-sm-6">
               {this.props.network_ok ? "": "Network issues!"}
                 <p>Loading: {this.props.offset}/{this.props.count}</p>
                 {this.props.busy | this.props.changed ? <img src="box.gif" width="60" />: ""}

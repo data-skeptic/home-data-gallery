@@ -41,11 +41,19 @@ body {
 #logo {
   float:left;
 }
-
-#logo-img {
-  height: 20px;
+/* Alex K Changes */
+.row {
+  margin-bottom: 20px;
 }
 
+#logo-img {
+  margin-left: 25px;
+  padding-left: 30px;
+  background: url("http://dataskeptic.com/home-sales/dshs.png") no-repeat; /* TODO get image locally */
+  background-size: 20px;
+  background-position: left center;
+}
+/* Alex K Changes End */
 #title {
   margin-left: 30px;
   color: #eee;
