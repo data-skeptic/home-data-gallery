@@ -18,6 +18,7 @@ export default class {
 			}
 		}
 		this.state = {local_storage_version}
+		this.haversineDistance = this.haversineDistance.bind(this)
 		console.log("Cache size: " + cacheSize)
 	}
 
@@ -53,7 +54,6 @@ export default class {
 		} catch (err) {
 			console.log(["err", err])
 		}
-		console.log(["gps", state])
 		return state
 	}
 
@@ -61,7 +61,6 @@ export default class {
 		localStorage.setItem("searchCriteria", JSON.stringify(state.searchCriteria))
 		localStorage.setItem("position", JSON.stringify(state.position))
 		localStorage.setItem("zoom", JSON.stringify(state.zoom))
-		console.log(["save version", this.state.local_storage_version])
 		localStorage.setItem("local_storage_version", this.state.local_storage_version)
 	}
 
@@ -142,8 +141,7 @@ export default class {
 		var clat = position.latitude
 		var clon = position.longitude
 		// TODO: get this from zoom instead
-		//this.haversineDistance({"latitude": clat, "longitude": clon}, {"latitude": lat2, "longitude": lon2})
-		var radius_miles = 20
+		var radius_miles = 2000
 		// TODO: revisit this 500
 		var n = 500
 		var kdmatches = this.tree.nearest({"latitude": clat, "longitude": clon}, n, radius_miles)
@@ -152,9 +150,9 @@ export default class {
 		for (var i=0; i < kdmatches.length; i++) {
 			var match = kdmatches[i][0]
 			// Trim radius result down to viewport
-			if (this.isInside(match['latitude'], match['longitude'], viewport)) {
-				cmatches.push(match)
-			}
+			//if (this.isInside(match['latitude'], match['longitude'], viewport)) {
+			cmatches.push(match)
+			//}
 		}
 
 		var matches = []

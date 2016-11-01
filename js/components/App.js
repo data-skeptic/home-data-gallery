@@ -30,7 +30,7 @@ export default class App extends React.Component {
 		this.curlRequest = this.curlRequest.bind(this)
 		this.addNewProperties = this.addNewProperties.bind(this)
 		this.updateSearchCriteria = this.updateSearchCriteria.bind(this)
-		this.setPositionScale = this.setPositionScale.bind(this)
+		this.setPositionAndZoom = this.setPositionAndZoom.bind(this)
 		this.savePersistentState = this.savePersistentState.bind(this)
 		this.has_moved = this.has_moved.bind(this)
 		console.log("---")
@@ -119,7 +119,7 @@ export default class App extends React.Component {
 		var s3 = new Date().getTime()
 		this.setState({count, offset, listings})
 		var s4 = new Date().getTime()
-		console.log(['slow run:', s4-s3])
+		console.log(['Time to update:', s4-s3])
 		// TODO: do eviction
 		// TODO: Do filtering
 	  	/*
@@ -130,12 +130,12 @@ export default class App extends React.Component {
 	    */
 	}
 
-	setPositionScale(position, scale) {
-		var prev = {position: this.state.position, scale: this.state.scale}
-		var now = {position: position, scale: scale}
+	setPositionAndZoom(position, zoom) {
+		var prev = {position: this.state.position, zoom: this.state.zoom}
+		var now = {position: position, zoom: zoom}
 		if (this.has_moved(prev, now)) {
 			console.log("moved")
-			this.setState({position, scale, offset: 0, count: 1})
+			this.setState({position, zoom, offset: 0, count: 1})
 			this.savePersistentState()
 			console.log([prev, now])
 			console.log("persist")
@@ -184,6 +184,7 @@ export default class App extends React.Component {
 				  dataType: 'json',
 				  success: function (resp) {
 				  	console.log("success")
+				  	console.log(resp)
 					me.addNewProperties(resp)
 				  	var now = {position: me.state.position, scale: me.state.scale}
 				  	if (me.has_moved(prev, now)) {
@@ -227,7 +228,7 @@ export default class App extends React.Component {
 	    return (<div>
 	    		  <Header />
 	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} network_ok={this.state.network_ok} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
-	    		  <DataView position={this.state.position} zoom={this.state.zoom} setPositionScale={this.setPositionScale} listings={this.state.listings} />
+	    		  <DataView position={this.state.position} zoom={this.state.zoom} setPositionAndZoom={this.setPositionAndZoom} listings={this.state.listings} />
 	    		  <Footer />
 	           </div>)
 	}

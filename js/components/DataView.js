@@ -18,7 +18,7 @@ export default class DataView extends React.Component {
 	    		<div id="tabs">
 	    			<div id="rowOne">
 	    				<div id="rowOneLeft">
-	    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionScale={this.props.setPositionScale} />
+	    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />
 	    				</div>
 	    				<div id="rowOneRight">
 	    					<PlotsNone  />
@@ -35,7 +35,7 @@ export default class DataView extends React.Component {
 	    		<div id="tabs">
 	    			<div id="rowOne">
 	    				<div id="rowOneLeft">
-	    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionScale={this.props.setPositionScale} />
+	    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />
 	    				</div>
 	    				<div id="rowOneRight">
 	    					<Plots listings={this.props.listings} />
