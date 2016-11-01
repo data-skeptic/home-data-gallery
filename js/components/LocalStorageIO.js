@@ -1,24 +1,71 @@
 export default class {
-	constructor() {
+	constructor(local_storage_version) {
+		this.validate(local_storage_version)
 		this.tree = new kdTree([], this.haversineDistance, ["latitude", "longitude"])
 		var keys = Object.keys(localStorage)
 		var cacheSize = 0
 		for (var i=0; i < keys.length; i++) {
 			var key = keys[i]
-			var str = localStorage.getItem(key)
-			var elem = JSON.parse(str)
-			if (elem['address_object']) {
-				elem['latitude'] = elem['address_object']['latitude']
-				elem['longitude'] = elem['address_object']['longitude']
-				this.tree.insert(elem)
-				cacheSize += 1
+			if (key.length > 3 && key.substring(0,3)=="oh-") {
+				var str = localStorage.getItem(key)
+				var elem = JSON.parse(str)
+				if (elem['address_object']) {
+					elem['latitude'] = elem['address_object']['latitude']
+					elem['longitude'] = elem['address_object']['longitude']
+					this.tree.insert(elem)
+					cacheSize += 1				
+				}
 			}
 		}
+		this.state = {local_storage_version}
+		this.haversineDistance = this.haversineDistance.bind(this)
 		console.log("Cache size: " + cacheSize)
 	}
 
+	validate(local_storage_version) {
+		var version = localStorage.getItem("local_storage_version")
+		if (version == undefined) {
+			// In case something is there but version is missing
+			console.log("No localStorage")
+			localStorage.clear()
+			return
+		}
+		if (version != local_storage_version) {
+			console.log("Clearing localStorage")
+			localStorage.clear()
+		}
+	}
+
+	getPersistentState() {
+		var state = {}
+		try {
+			var sc = localStorage.getItem("searchCriteria")
+			var p = localStorage.getItem("position")
+			var s = localStorage.getItem("zoom")
+			if (sc != undefined) {
+				state.searchCriteria = JSON.parse(sc)
+			}
+			if (p != undefined) {
+				state.position = JSON.parse(p)
+			}
+			if (s != undefined) {
+				state.zoom = JSON.parse(s)
+			}
+		} catch (err) {
+			console.log(["err", err])
+		}
+		return state
+	}
+
+	savePersistentState(state) {
+		localStorage.setItem("searchCriteria", JSON.stringify(state.searchCriteria))
+		localStorage.setItem("position", JSON.stringify(state.position))
+		localStorage.setItem("zoom", JSON.stringify(state.zoom))
+		localStorage.setItem("local_storage_version", this.state.local_storage_version)
+	}
+
 	readLocalStorage(id) {
-		var elem = localStorage.getItem(id)
+		var elem = localStorage.getItem("oh-" + id)
 		if (elem != undefined) {
 			elem = JSON.parse(elem)
 		}
@@ -90,24 +137,22 @@ export default class {
 	  return false
 	}
 
-	readPropertiesFromLocalStorage(viewport, filters) {
-		var lat1 = viewport.top
-		var lon1 = viewport.left
-		var lat2 = viewport.bottom
-		var lon2 = viewport.right
-		var clat = (lat1 - lat2)/2 + lat2
-		var clon = (lon1 - lon2)/2 + lon2
-		var radius_miles = this.haversineDistance({"latitude": clat, "longitude": clon}, {"latitude": lat2, "longitude": lon2})
+	readPropertiesFromLocalStorage(position, zoom, filters) {
+		var clat = position.latitude
+		var clon = position.longitude
+		// TODO: get this from zoom instead
+		var radius_miles = 2000
 		// TODO: revisit this 500
-		var kdmatches = this.tree.nearest({"latitude": clat, "longitude": clon}, 500, radius_miles)
+		var n = 500
+		var kdmatches = this.tree.nearest({"latitude": clat, "longitude": clon}, n, radius_miles)
 
 		var cmatches = []
 		for (var i=0; i < kdmatches.length; i++) {
 			var match = kdmatches[i][0]
 			// Trim radius result down to viewport
-			if (this.isInside(match['latitude'], match['longitude'], viewport)) {
-				cmatches.push(match)
-			}
+			//if (this.isInside(match['latitude'], match['longitude'], viewport)) {
+			cmatches.push(match)
+			//}
 		}
 
 		var matches = []
@@ -179,7 +224,7 @@ export default class {
 
 			        // Save element to `localStore` to be more persistent
 			        try {
-			         	localStorage.setItem(elem['id'], JSON.stringify(toCache))
+			         	localStorage.setItem("oh-" + elem['id'], JSON.stringify(toCache))
 			        } catch (err) {
 			        	if (err.name == "QuotaExceededError") {
 			            	console.log("Quota issue")
