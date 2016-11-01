@@ -10,10 +10,9 @@ import LocalStorageIO from './LocalStorageIO'
 import $ from 'jquery'
 import _ from 'lodash'
 
-var local_storage_version = "1.0.3"
+var local_storage_version = "1.0.4"
 
 const localStorageIO = new LocalStorageIO(local_storage_version)
-//localStorageIO.clearLocalStorage()
 
 export default class App extends React.Component {
 
@@ -22,7 +21,7 @@ export default class App extends React.Component {
 
 		var state = this.getPersistentState()
 		var filters = {}
-		var listings = localStorageIO.readPropertiesFromLocalStorage(state.position, state.zoom, filters) 
+		var listings = localStorageIO.readPropertiesFromLocalStorage(state.position, state.zoom, state.bounds, filters) 
 		state.listings = listings
 		this.state = state
 
@@ -46,8 +45,14 @@ export default class App extends React.Component {
 	}
 
 	getPersistentState() {
-		var position = {latitude: 40.7, longitude: -100.95}
+		var position = {latitude: 33.7, longitude: -118.2}
 		var zoom = 7
+		var bounds = {
+			right: 35.074964853989556,
+			top: -115.927734375,
+			left: 32.33355894864106,
+			bottom: -120.32226562500001
+		}
 		var searchCriteria = {
 			price: [0, 1000000],
 			bedrooms: [0, 8],
@@ -65,7 +70,8 @@ export default class App extends React.Component {
 			busy: false,
 			searchCriteria: searchCriteria,
 			position: position,
-			zoom: zoom
+			zoom: zoom,
+			bounds: bounds
 		}
 		var saved = localStorageIO.getPersistentState()
 		if (saved != undefined) {
@@ -76,13 +82,10 @@ export default class App extends React.Component {
 				state[key] = val
 			}
 		}
-		console.log("state")
-		console.log(state)
 		return state
 	}
 
 	savePersistentState() {
-		console.log(["save", this.state])
 		localStorageIO.savePersistentState(this.state)
 	}
 
@@ -100,7 +103,7 @@ export default class App extends React.Component {
 		}
 		var nstate = {searchCriteria: uSearchCriteria, offset: 0, count: 1}
 		this.setState(nstate)
-		var matches = localStorageIO.readPropertiesFromLocalStorage(this.position, this.scale, filters) 
+		var matches = localStorageIO.readPropertiesFromLocalStorage(this.state.position, this.state.zoom, this.state.bounds, filters) 
 		// TODO: update from cache
 		// TODO: update ajax
 		this.savePersistentState()
@@ -115,7 +118,7 @@ export default class App extends React.Component {
 		}
 		var filters = {}
 		localStorageIO.writeLocalStorage(resp)
-		var listings = localStorageIO.readPropertiesFromLocalStorage(this.state.position, this.state.scale, filters) 
+		var listings = localStorageIO.readPropertiesFromLocalStorage(this.state.position, this.state.zoom, this.state.bounds, filters) 
 		var s3 = new Date().getTime()
 		this.setState({count, offset, listings})
 		var s4 = new Date().getTime()
@@ -130,19 +133,65 @@ export default class App extends React.Component {
 	    */
 	}
 
-	setPositionAndZoom(position, zoom) {
+	setPositionAndZoom(position, zoom, leaflet_bounds) {
+		var bounds = {
+			right:  leaflet_bounds._northEast.lat,
+			top:    leaflet_bounds._northEast.lng,
+			left:   leaflet_bounds._southWest.lat,
+			bottom: leaflet_bounds._southWest.lng
+		}
+		console.log("=-=-=-=-=")
+		console.log(leaflet_bounds)
+		console.log(bounds)
 		var prev = {position: this.state.position, zoom: this.state.zoom}
 		var now = {position: position, zoom: zoom}
 		if (this.has_moved(prev, now)) {
 			console.log("moved")
-			this.setState({position, zoom, offset: 0, count: 1})
+			this.setState({position, zoom, bounds, offset: 0, count: 1})
 			this.savePersistentState()
-			console.log([prev, now])
-			console.log("persist")
-			console.log(now)
 		} else {
 			console.log("not moved")
 		}
+	}
+
+	haversineDistance(p1, p2, isMiles=1) {
+		function toRad(x) {
+			return x * Math.PI / 180;
+		}
+		var lat1 = p1['latitude']
+		if (lat1 == undefined && p1['address_object'] != undefined)
+			lat1 = p1['address_object']['latitude']
+		var lon1 = p1['longitude']
+		if (lon1 == undefined && p1['address_object'] != undefined)
+			lon1 = p1['address_object']['longitude']
+
+		if (lat1 == undefined || lon1 == undefined) {
+			return 99999999
+		}
+
+		var lat2 = p2['latitude']
+		if (lat2 == undefined && p2['address_object'] != undefined)
+			lat2 = p2['address_object']['latitude']
+		var lon2 = p2['longitude']
+		if (lon2 == undefined && p2['address_object'] != undefined)
+			lon2 = p2['address_object']['longitude']
+
+		if (lat2 == undefined || lon2 == undefined) {
+			return 99999999
+		}
+
+		var R = 6371; // km
+		var x1 = lat2 - lat1;
+		var dLat = toRad(x1);
+		var x2 = lon2 - lon1;
+		var dLon = toRad(x2)
+		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+		Math.sin(dLon / 2) * Math.sin(dLon / 2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		var d = R * c;
+		if(isMiles) d /= 1.60934;
+		return d;
 	}
 
 	curlRequest() {
@@ -159,8 +208,10 @@ export default class App extends React.Component {
 		var curl = `http://api.openhouseproject.co/api/property/?min_price=${minprice}&max_price=${maxprice}&min_bedrooms=${minbed}&max_bedrooms=${maxbed}&min_bathrooms=${minbath}&max_bathrooms=${maxbath}&min_building_size=${minsqft}&max_building_size=${maxsqft}`
 		var lat = position.latitude
 		var lng = position.longitude
-		// TODO: revisit this radius
-		var rad = 10
+		var bounds = this.state.bounds
+		var corner = {latitude: bounds.left, longitude: bounds.top}
+		var rad = this.haversineDistance(position, corner)
+		console.log(["rad", rad])
 		curl = curl + "&close_to=(" + rad + "," + lat + "," + lng + ")"
 		return curl
 	}

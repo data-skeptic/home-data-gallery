@@ -9,16 +9,15 @@ export default class OpenHouseMap extends React.Component {
   }
 
   handleMoveend(e) {
-    console.log("========")
     var map = e.target
     var c = map.getCenter()
     var z = map.getZoom()
+    var b = map.getBounds()
     var p = {latitude: c.lat, longitude: c.lng}
-    this.props.setPositionAndZoom(p, z)
+    this.props.setPositionAndZoom(p, z, b)
   }
 
   render() {
-    console.log("render map")
     var listings = this.props.listings
     const position = [this.props.position.latitude, this.props.position.longitude]
     return (

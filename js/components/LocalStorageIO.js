@@ -137,11 +137,12 @@ export default class {
 	  return false
 	}
 
-	readPropertiesFromLocalStorage(position, zoom, filters) {
+	readPropertiesFromLocalStorage(position, zoom, bounds, filters) {
 		var clat = position.latitude
 		var clon = position.longitude
-		// TODO: get this from zoom instead
-		var radius_miles = 2000
+		var corner = {latitude: bounds.left, longitude: bounds.top}
+		var r = this.haversineDistance(position, corner)
+		var radius_miles = r
 		// TODO: revisit this 500
 		var n = 500
 		var kdmatches = this.tree.nearest({"latitude": clat, "longitude": clon}, n, radius_miles)
@@ -150,9 +151,9 @@ export default class {
 		for (var i=0; i < kdmatches.length; i++) {
 			var match = kdmatches[i][0]
 			// Trim radius result down to viewport
-			//if (this.isInside(match['latitude'], match['longitude'], viewport)) {
-			cmatches.push(match)
-			//}
+			if (this.isInside(match['latitude'], match['longitude'], bounds)) {
+				cmatches.push(match)
+			}
 		}
 
 		var matches = []
