@@ -16,7 +16,7 @@ export default class DataView extends React.Component {
 	    		<div id="tabs">
 	    			<div id="rowOne">
 	    				<div id="rowOneLeft">
-	    					<OpenHouseMap listings={this.props.listings} setViewport={this.props.setViewport} />
+	    					<OpenHouseMap listings={this.props.listings} position={this.props.position} scale={this.props.scale} setPositionScale={this.props.setPositionScale} />
 	    				</div>
 	    				<div id="rowOneRight">
 	    					<Plots listings={this.props.listings} />

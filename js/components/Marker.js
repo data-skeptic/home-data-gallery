@@ -9,6 +9,7 @@ export default class Markers extends React.Component {
   render() {
   	if (this.props.listing != undefined) {
   		var listing = this.props.listing
+      console.log(listing)
   		return (<div id="map-listing-detail">
   			<b>{listing.address_object.formatted_address}</b><br/>
   			<i>${listing.price}</i><br/>

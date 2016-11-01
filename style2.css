@@ -46,6 +46,10 @@ body {
   height: 20px;
 }
 
+#info-img {
+  height: 20px;
+}
+
 #title {
   margin-left: 30px;
   color: #eee;
@@ -125,14 +129,19 @@ body {
   font-weight: bold;
 }
 
+.leaflet-container {
+    height: 400px;
+    width: 100%;
+}
+
 /*********************************************************
   PLOTS
 **********************************************************/
 
 
-#Plot {
-  margin: 10px;
-  background-color: #f00;
+.rd3-basic-chart {
+  margin-left: 55px;
+  margin-right: 55px;
 }
 
 

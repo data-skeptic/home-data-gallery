@@ -60,14 +60,14 @@ export default class Plots extends Component {
 					<Carousel autoplay={true} >
 						<BarComp
 							data={priceData}
-							class="Plot"
+							class="plot"
 							title="Price Histogram"
 							xAxisLabel="Price Bins"
 							yAxisLabel="No. Properties"
 						/>
 						<ScatterComp
 							data={scatterData}
-							className="Plot"
+							class="plot"
 							title="Price vs. sqft"
 							xAxisLabel="Price ($K)"
 							yAxisLabel="Area (Sqrt Ft)"
