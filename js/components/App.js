@@ -10,7 +10,7 @@ import LocalStorageIO from './LocalStorageIO'
 import $ from 'jquery'
 import _ from 'lodash'
 
-var local_storage_version = "1.0.2"
+var local_storage_version = "1.0.3"
 
 const localStorageIO = new LocalStorageIO(local_storage_version)
 //localStorageIO.clearLocalStorage()
@@ -22,7 +22,7 @@ export default class App extends React.Component {
 
 		var state = this.getPersistentState()
 		var filters = {}
-		var listings = localStorageIO.readPropertiesFromLocalStorage(state.position, state.scale, filters) 
+		var listings = localStorageIO.readPropertiesFromLocalStorage(state.position, state.zoom, filters) 
 		state.listings = listings
 		this.state = state
 
@@ -47,7 +47,7 @@ export default class App extends React.Component {
 
 	getPersistentState() {
 		var position = {latitude: 40.7, longitude: -100.95}
-		var scale = (1 << 11)
+		var zoom = 7
 		var searchCriteria = {
 			price: [0, 1000000],
 			bedrooms: [0, 8],
@@ -65,7 +65,7 @@ export default class App extends React.Component {
 			busy: false,
 			searchCriteria: searchCriteria,
 			position: position,
-			scale: scale
+			zoom: zoom
 		}
 		var saved = localStorageIO.getPersistentState()
 		if (saved != undefined) {
@@ -76,6 +76,8 @@ export default class App extends React.Component {
 				state[key] = val
 			}
 		}
+		console.log("state")
+		console.log(state)
 		return state
 	}
 
@@ -197,7 +199,7 @@ export default class App extends React.Component {
 				  }
 				})
 			} else {
-				console.log(["skip", this.state.position])
+				console.log("skip")
 			}
 		}
 	}
@@ -225,7 +227,7 @@ export default class App extends React.Component {
 	    return (<div>
 	    		  <Header />
 	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} network_ok={this.state.network_ok} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
-	    		  <DataView position={this.state.position} scale={this.state.scale} setPositionScale={this.setPositionScale} listings={this.state.listings} />
+	    		  <DataView position={this.state.position} zoom={this.state.zoom} setPositionScale={this.setPositionScale} listings={this.state.listings} />
 	    		  <Footer />
 	           </div>)
 	}

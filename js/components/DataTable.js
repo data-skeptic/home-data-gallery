@@ -52,9 +52,7 @@ export default class DataTable extends React.Component {
         {key: 'price', label: 'Price'},
         {key: 'bedrooms', label: 'Bedrooms'},
         {key: 'bathrooms', label: 'Bathrooms'},
-        {key: 'car_spaces', label: 'Car Spaces'},
         {key: 'building_size', label: 'Sq.ft.'},
-        {key: 'land_size', label: 'Land size'},
         {key: 'address', label: 'Address'}
     ]
 

@@ -40,7 +40,7 @@ export default class {
 		try {
 			var sc = localStorage.getItem("searchCriteria")
 			var p = localStorage.getItem("position")
-			var s = localStorage.getItem("scale")
+			var s = localStorage.getItem("zoom")
 			if (sc != undefined) {
 				state.searchCriteria = JSON.parse(sc)
 			}
@@ -48,7 +48,7 @@ export default class {
 				state.position = JSON.parse(p)
 			}
 			if (s != undefined) {
-				state.scale = JSON.parse(s)
+				state.zoom = JSON.parse(s)
 			}
 		} catch (err) {
 			console.log(["err", err])
@@ -60,7 +60,7 @@ export default class {
 	savePersistentState(state) {
 		localStorage.setItem("searchCriteria", JSON.stringify(state.searchCriteria))
 		localStorage.setItem("position", JSON.stringify(state.position))
-		localStorage.setItem("scale", JSON.stringify(state.scale))
+		localStorage.setItem("zoom", JSON.stringify(state.zoom))
 		console.log(["save version", this.state.local_storage_version])
 		localStorage.setItem("local_storage_version", this.state.local_storage_version)
 	}
@@ -138,10 +138,10 @@ export default class {
 	  return false
 	}
 
-	readPropertiesFromLocalStorage(position, scale, filters) {
+	readPropertiesFromLocalStorage(position, zoom, filters) {
 		var clat = position.latitude
 		var clon = position.longitude
-		// TODO: get this from scale instead
+		// TODO: get this from zoom instead
 		//this.haversineDistance({"latitude": clat, "longitude": clon}, {"latitude": lat2, "longitude": lon2})
 		var radius_miles = 20
 		// TODO: revisit this 500
