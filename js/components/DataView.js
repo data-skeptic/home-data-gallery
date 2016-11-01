@@ -38,7 +38,9 @@ export default class DataView extends React.Component {
 	    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />
 	    				</div>
 	    				<div class="col-md-6">
-	    					<Plots listings={this.props.listings} />
+	    					<div id="rowOneRight">
+		    					<Plots listings={this.props.listings} />
+	    					</div>
 						</div>
 	    			</div>
 	    			<div class="row">
