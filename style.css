@@ -26,7 +26,6 @@ body {
 #controls-left {
   float: left;
   padding: 5px;
-<<<<<<< HEAD
 }
 
 #controls-right {
@@ -61,47 +60,8 @@ body {
 /* Alex K Changes End */
 
 .gnu-img {
-  height: 20px;
+  height: 30px;
 }
-
-#title {
-  float: left;
-  margin-left: 10px;
-  color: #eee;
-  font-weight: bold;
-=======
-}
-
-#controls-right {
-  overflow: hidden;
-  height: 90px;
-}
-
-#controls-center {
-  float: left;
-  padding: 5px;
-}
-
-#logo {
-  float:left;
-}
-/* Alex K Changes */
-.row {
-  margin-bottom: 20px;
-}
-
-#logo-img {
-  margin-left: 5px;
-  padding-left: 5px;
-  height: 20px;
-}
-
-#info-img {
-  margin-left: 25px;
-  height: 20px;
-}
-
-/* Alex K Changes End */
 
 #title {
   float: left;
@@ -142,13 +102,11 @@ body {
 #btnCopy {
     width: 25px;
     height: 15px;
->>>>>>> be4b8d179f0084a2e46bab8355fdac3bead6e910
 }
 
 #rowOneLeft {
 }
 
-<<<<<<< HEAD
 .col-sm-6 {
   overflow: hidden;
   height: 90px;
@@ -207,31 +165,6 @@ body {
   padding-bottom: 10px;
 }
 
-=======
-.curl {
-  font-size: 8pt;
-  height: 20px;
-}
-
-/*********************************************************
-  DATA TABLE
-**********************************************************/
-
-.jsonTable {
-}
-
-.jsonHeader {
-
-}
-
-.jsonColumn {
-  background-color: #ddd;
-  padding-right: 20px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
->>>>>>> be4b8d179f0084a2e46bab8355fdac3bead6e910
 .jsonRow {
 
 }
