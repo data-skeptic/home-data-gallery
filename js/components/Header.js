@@ -9,7 +9,10 @@ export default class Header extends React.Component {
 					<img id="logo-img" src="/img/dshs.png" />
 					</div>
 					<div id="title">OpenHouse Project</div>
-					<img id="info-img" src="/img/info.png" />
+					<div class="tooltip">
+						<img id="info-img" src="/img/info.png" />
+						<span class="tooltiptext">Tooltip text</span>
+					</div>
 				</div>
 		)
 	}

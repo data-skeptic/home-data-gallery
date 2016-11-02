@@ -178,11 +178,18 @@ body {
   width: 400px;
   height: 300px;
   padding: 10px;
-  margin-left: 5px;
-  text-align: center;
-  font-size: 14pt;
+  margin-left: 405px;
 }
 
+.plots-empty-title {
+  text-align: center;
+  font-size: 16pt;
+  font-weight: bold  
+}
+
+.plots-empty-title2 {
+  font-size: 14pt;
+}
 
 
 
@@ -478,7 +485,70 @@ body {
 
 
 
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
 
 
 
 
+
+/*********************************************************
+  URL SUBMIT BOX
+**********************************************************/
+
+
+.box {
+  width:300px;
+}
+#btnSubmit {
+  padding: 5px;
+}
+#urlbox {
+  margin-top: 5px;
+  margin-bottom: 10px;
+  padding: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #999;
+  border-radius: 4px;
+}
+.alertbox {
+  width: 325px;
+  margin-top: 10px;
+  padding: 5px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #000;
+  border-radius: 4px;
+  text-align: center;
+}
+.waiting {
+  background-color: #eef;
+}
+.thanks {
+  background-color: #efe;
+}
+.error {
+  background-color: #fee;  
+}

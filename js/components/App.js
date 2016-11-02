@@ -54,7 +54,7 @@ export default class App extends React.Component {
 			bottom: -120.32226562500001
 		}
 		var searchCriteria = {
-			price: [0, 1000000],
+			price: [0, 5000000],
 			bedrooms: [0, 8],
 			bathrooms: [0, 7],
 			sqft: [100, 4000],
