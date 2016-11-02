@@ -17,7 +17,6 @@ export default class PlotsNone extends Component {
     	this.onSubmit = this.onSubmit.bind(this)
     }
     onSubmit() {
-    	console.log("submit")
 	    var api = "https://5xwvsgjnqi.execute-api.us-east-1.amazonaws.com/prod/OH-submit-url"
 	    var email = $("#email").val()
 	    var url = $("#url").val()

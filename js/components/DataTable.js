@@ -32,6 +32,7 @@ export default class DataTable extends React.Component {
         listing['address'] = listing['address_object']['formatted_address']
         delete listing['address_object']
       }
+      listing['listing_timestamp'] = listing['listing_timestamp'].substring(0, 10)
     }
 
     // Sort the table
