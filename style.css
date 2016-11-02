@@ -59,6 +59,10 @@ body {
 
 /* Alex K Changes End */
 
+.gnu-img {
+  height: 20px;
+}
+
 #title {
   float: left;
   margin-left: 10px;

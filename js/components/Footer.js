@@ -6,7 +6,7 @@ export default class Footer extends React.Component {
   render() {
     return (<div>
     		<hr/>
-            License info
+    		<a href="http://www.gnu.org/licenses/gpl-3.0.txt"><img class="gnu-img" src="/img/gnu-gpl-3.png" /></a>
            </div>)
   }
 }
