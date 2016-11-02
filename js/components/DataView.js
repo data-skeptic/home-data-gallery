@@ -13,43 +13,36 @@ export default class DataView extends React.Component {
 	}
 
 	render() {
-		if (this.props.listings.length == 0) {
-			return (
-	    		<div id="tabs">
-	    			<div id="rowOne">
-	    				<div id="rowOneLeft">
-	    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />
-	    				</div>
-	    				<div id="rowOneRight">
-	    					<PlotsNone  />
+		var plotArea = (<div></div>)
+		if (this.props.oneLoadComplete) {
+			if (this.props.listings.length == 0) {
+				plotArea = <PlotsNone />
+			}
+			else {
+				plotArea = (
+					<div class="col-md-6">
+						<div id="rowOneRight">
+							<Plots listings={this.props.listings} />
 						</div>
-	    			</div>
-					<div class="clear"></div>
-	    			<div>
-		    			<DataTable listings={this.props.listings} />
-	    			</div>
-	           </div>
-			)
-		} else {
-		    return (
-	    		<div id="tabs">
-	    			<div id="rowOne">
-	    				<div id="rowOneLeft">
-	    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />
-	    				</div>
-	    				<div class="col-md-6">
-	    					<div id="rowOneRight">
-		    					<Plots listings={this.props.listings} />
-	    					</div>
-						</div>
-	    			</div>
-	    			<div class="row">
-						<div class="col-sm-12">
-		    				<DataTable listings={this.props.listings} />
-						</div>
-	    			</div>
-	           </div>
-		    )
+					</div>
+				)
+			}
 		}
+		return (
+    		<div id="tabs">
+    			<div id="rowOne">
+    				<div id="rowOneLeft">
+    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />
+    				</div>
+    				<div id="rowOneRight">
+    					{plotArea}
+					</div>
+    			</div>
+				<div class="clear"></div>
+    			<div>
+	    			<DataTable listings={this.props.listings} />
+    			</div>
+           </div>
+		)
 	}
 }
