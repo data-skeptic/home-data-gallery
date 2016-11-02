@@ -54,7 +54,7 @@ export default class App extends React.Component {
 			bottom: -120.32226562500001
 		}
 		var searchCriteria = {
-			price: [0, 1000000],
+			price: [0, 5000000],
 			bedrooms: [0, 8],
 			bathrooms: [0, 7],
 			sqft: [100, 4000],
@@ -211,7 +211,6 @@ export default class App extends React.Component {
 		var bounds = this.state.bounds
 		var corner = {latitude: bounds.left, longitude: bounds.top}
 		var rad = this.haversineDistance(position, corner)
-		console.log(["rad", rad])
 		curl = curl + "&close_to=(" + rad + "," + lat + "," + lng + ")"
 		return curl
 	}
@@ -221,7 +220,6 @@ export default class App extends React.Component {
 			var limit = this.state.limit
 			var count = this.state.count
 			if (offset < count) {
-				console.log("go")
 				this.setState({busy: true})
 				var curl = this.curlRequest()
 				var url = curl + `&limit=${limit}&offset=${offset}`
@@ -234,8 +232,7 @@ export default class App extends React.Component {
 				  contentType: 'text/json',
 				  dataType: 'json',
 				  success: function (resp) {
-				  	console.log("success")
-				  	console.log(resp)
+				  	console.log(["Api return result:", resp['results'].length, resp['count']])
 					me.addNewProperties(resp)
 				  	var now = {position: me.state.position, scale: me.state.scale}
 				  	if (me.has_moved(prev, now)) {
@@ -251,7 +248,7 @@ export default class App extends React.Component {
 				  }
 				})
 			} else {
-				console.log("skip")
+				//console.log("skip")
 			}
 		}
 	}

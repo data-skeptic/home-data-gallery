@@ -121,18 +121,26 @@ export default class {
 		return d;
 	}
 
+	isBetween(x, a, b) {
+		if (a <= x && x <= b)
+			return true
+		if (b <= x && x <= a)
+			return true
+		return false
+	}
+
 	isInside(lat, lon, bbox) {
 	  if (lat == null || lon == null) {
 	    return false
 	  }
-	  var lat1 = bbox.top
-	  var lon1 = bbox.left
-	  var lat2 = bbox.bottom
-	  var lon2 = bbox.right
-	  if (lat2 <= lat && lat <= lat1) {
-	    if (lon1 <= lon && lon <= lon2) {
-	      return true
-	    }
+	  var lat1 = bbox.left
+	  var lon1 = bbox.bottom
+	  var lat2 = bbox.right
+	  var lon2 = bbox.top
+	  var a = this.isBetween(lat, lat1, lat2)
+	  var b = this.isBetween(lon, lon1, lon2)
+	  if (a && b) {
+	  	return true
 	  }
 	  return false
 	}
@@ -141,16 +149,15 @@ export default class {
 		var clat = position.latitude
 		var clon = position.longitude
 		var corner = {latitude: bounds.left, longitude: bounds.top}
-		var r = this.haversineDistance(position, corner)
-		var radius_miles = r
+		var radius_miles = this.haversineDistance(position, corner)
 		// TODO: revisit this 500
 		var n = 500
 		var kdmatches = this.tree.nearest({"latitude": clat, "longitude": clon}, n, radius_miles)
 
+		// Trim radius result down to viewport
 		var cmatches = []
 		for (var i=0; i < kdmatches.length; i++) {
 			var match = kdmatches[i][0]
-			// Trim radius result down to viewport
 			if (this.isInside(match['latitude'], match['longitude'], bounds)) {
 				cmatches.push(match)
 			}
