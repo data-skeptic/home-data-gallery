@@ -32,8 +32,6 @@ export default class App extends React.Component {
 		this.setPositionAndZoom = this.setPositionAndZoom.bind(this)
 		this.savePersistentState = this.savePersistentState.bind(this)
 		this.has_moved = this.has_moved.bind(this)
-		console.log("---")
-		console.log(this.state)
 	}
 
 	componentDidMount() {
@@ -68,6 +66,7 @@ export default class App extends React.Component {
 			numCalls: 0,
 			changed: false,
 			busy: false,
+			oneLoadComplete: false,
 			searchCriteria: searchCriteria,
 			position: position,
 			zoom: zoom,
@@ -125,12 +124,6 @@ export default class App extends React.Component {
 		console.log(['Time to update:', s4-s3])
 		// TODO: do eviction
 		// TODO: Do filtering
-	  	/*
-	    var bounds = map.getExtent().clone()
-	    bbox = bounds.transform(map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"))
-	    this.filters = get_request()
-	    results = readPropertiesFromLocalStorage(bbox, this.filters)
-	    */
 	}
 
 	setPositionAndZoom(position, zoom, leaflet_bounds) {
@@ -140,17 +133,11 @@ export default class App extends React.Component {
 			left:   leaflet_bounds._southWest.lat,
 			bottom: leaflet_bounds._southWest.lng
 		}
-		console.log("=-=-=-=-=")
-		console.log(leaflet_bounds)
-		console.log(bounds)
 		var prev = {position: this.state.position, zoom: this.state.zoom}
 		var now = {position: position, zoom: zoom}
 		if (this.has_moved(prev, now)) {
-			console.log("moved")
 			this.setState({position, zoom, bounds, offset: 0, count: 1})
 			this.savePersistentState()
-		} else {
-			console.log("not moved")
 		}
 	}
 
@@ -236,9 +223,9 @@ export default class App extends React.Component {
 					me.addNewProperties(resp)
 				  	var now = {position: me.state.position, scale: me.state.scale}
 				  	if (me.has_moved(prev, now)) {
-					  	me.setState({busy: false, offset: 0, count: 1})
+					  	me.setState({busy: false, oneLoadComplete: true, offset: 0, count: 1})
 					} else {
-					  	me.setState({busy: false})
+					  	me.setState({busy: false, oneLoadComplete: true})
 				  	}
 				  },
 				  error: function (xhr, ajaxOptions, thrownError) {
@@ -276,7 +263,7 @@ export default class App extends React.Component {
 	    return (<div>
 	    		  <Header />
 	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} network_ok={this.state.network_ok} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
-	    		  <DataView position={this.state.position} zoom={this.state.zoom} setPositionAndZoom={this.setPositionAndZoom} listings={this.state.listings} />
+	    		  <DataView position={this.state.position} zoom={this.state.zoom} setPositionAndZoom={this.setPositionAndZoom} listings={this.state.listings} oneLoadComplete={this.state.oneLoadComplete} />
 	    		  <Footer />
 	           </div>)
 	}
