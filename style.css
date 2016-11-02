@@ -219,6 +219,14 @@ body {
   margin-left: 405px;
 }
 
+.Plots {
+  width: 500px
+}
+
+.rd3-chart {
+  font-size: 8pt;
+}
+
 .plots-empty-title {
   text-align: center;
   font-size: 16pt;

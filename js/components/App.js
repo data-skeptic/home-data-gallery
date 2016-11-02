@@ -112,18 +112,14 @@ export default class App extends React.Component {
 		var listings = resp["results"]
 		var count = resp['count']
 		var offset = this.state.offset + resp['results'].length
-		if (true) { // This line tells it to give up after 1 call, good for development
-			offset = count
-		}
 		var filters = {}
+		console.log("calling writeLocalStorage")
 		localStorageIO.writeLocalStorage(resp)
 		var listings = localStorageIO.readPropertiesFromLocalStorage(this.state.position, this.state.zoom, this.state.bounds, filters) 
 		var s3 = new Date().getTime()
 		this.setState({count, offset, listings})
 		var s4 = new Date().getTime()
 		console.log(['Time to update:', s4-s3])
-		// TODO: do eviction
-		// TODO: Do filtering
 	}
 
 	setPositionAndZoom(position, zoom, leaflet_bounds) {
@@ -206,7 +202,7 @@ export default class App extends React.Component {
 			var offset = this.state.offset
 			var limit = this.state.limit
 			var count = this.state.count
-			if (offset < count) {
+			if (offset < count && offset == 0) {
 				this.setState({busy: true})
 				var curl = this.curlRequest()
 				var url = curl + `&limit=${limit}&offset=${offset}`
@@ -235,7 +231,10 @@ export default class App extends React.Component {
 				  }
 				})
 			} else {
-				//console.log("skip")
+				if (this.state.busy) {
+					console.log("Reset busy since download is done.")
+					me.setState({busy: false})
+				}
 			}
 		}
 	}

@@ -210,6 +210,7 @@ export default class {
 
 	writeLocalStorage(response) {
 		var data = response['results']
+		var failCount = 0
 		if (data.length > 0) {
 			for (var i=0; i < data.length; i++) {
 		  		var elem = data[i]
@@ -228,15 +229,31 @@ export default class {
 			            	this.tree.remove(dupe)
 				        }
 			        }
-			        this.tree.insert(toCache)
 
 			        // Save element to `localStore` to be more persistent
 			        try {
+				        this.tree.insert(toCache)
 			         	localStorage.setItem("oh-" + elem['id'], JSON.stringify(toCache))
 			        } catch (err) {
 			        	if (err.name == "QuotaExceededError") {
 			            	console.log("Quota issue")
-			        		// TODO: handle it better
+			            	var n = 500
+			            	var clat = -1 * toCache['latitude']
+			            	var clon = -1 * toCache['longitude']
+			            	var radius_miles = 24901 * 1.1
+			            	var evictions = this.tree.nearest({"latitude": clat, "longitude": clon}, n, radius_miles)
+			            	for (var k=0; k < evictions.length; k++) {
+			            		var eviction = evictions[k]
+			            		this.tree.remove(eviction[0])
+			            		localStorage.removeItem("oh-" + eviction["id"])
+			            	}
+			            	i -= 1
+			            	failCount += 1
+			            	if (failCount == 3) {
+			            		console.log("Hard reset on local cache")
+			            		localStorage.clear()
+			            		i = 0
+			            	}
 			          	} else {
 			            	console.log(err)
 			          	}

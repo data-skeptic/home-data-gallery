@@ -30,7 +30,23 @@ export default class Controls extends React.Component {
 	render() {
     var curl = this.state.curlRequestFn()
     this.state.value = curl
-  	return (<div id="controls" class="row">
+    var loadingMessage = <p>Loading...</p>
+    if (this.props.busy || this.props.changed) {
+      if (this.props.offset == 0 && this.props.count == 1) {
+        loadingMessage = <p>Looking in this area...</p>
+      }
+      else {
+        loadingMessage = <p>Checking for more listings...</p>
+      }
+    } else {
+      if (this.props.count > 0) {
+        var ratio = 1.0 * this.props.offset / this.props.count
+        loadingMessage = <p>Sample size shown: {parseInt(ratio*100).toString()}%</p>
+      } else {
+        loadingMessage = <p>No records found.</p>
+      }
+    }
+    return (<div id="controls" class="row">
               <div class="col-sm-3">
           			<Slider title='Beds' min_value={0} max_value={10} low={this.props.searchCriteria.bedrooms[0]} high={this.props.searchCriteria.bedrooms[1]} onUpdate={this.onUpdate.bind(this, 'bedrooms')} />
           			<Slider title='Bath' min_value={0} max_value={10} low={this.props.searchCriteria.bathrooms[0]} high={this.props.searchCriteria.bathrooms[1]} onUpdate={this.onUpdate.bind(this, 'bathrooms')} />
@@ -41,7 +57,7 @@ export default class Controls extends React.Component {
               </div>
               <div class="col-sm-6">
               {this.props.network_ok ? "": "Network issues!"}
-                <p>Loading: {this.props.offset}/{this.props.count}</p>
+                {loadingMessage}
                 {this.props.busy | this.props.changed ? <img src="box.gif" width="60" />: ""}
                 <div id='curlBox'>
                   <span class="ui_label">cURL request: </span>
