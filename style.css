@@ -277,6 +277,7 @@ body {
 
 
 .rc-slider {
+  margin-bottom: .5rem;
   position: relative;
   height: 4px;
   width: 100%;
