@@ -33,17 +33,27 @@ export default class Controls extends React.Component {
     var loadingMessage = <p>Loading...</p>
     if (this.props.busy || this.props.changed) {
       if (this.props.offset == 0 && this.props.count == 1) {
-        loadingMessage = <p>Looking in this area...</p>
+        loadingMessage = <div class="alert alert-info" role="alert">
+                            <strong>Hang fire a second!</strong> Were looking for properties in this area.
+                            <img src="box.gif" class="float-xs-right" alt="Loading image" width="40"/>
+                          </div>
       }
       else {
-        loadingMessage = <p>Checking for more listings...</p>
+        loadingMessage = <div class="alert alert-info" role="alert">
+                            <strong>Hang fire a second!</strong> Were checking for more listings...
+                            <img src="box.gif" class="float-xs-right" alt="Loading image" width="40"/>
+                          </div>
       }
     } else {
       if (this.props.count > 0) {
         var ratio = 1.0 * this.props.offset / this.props.count
-        loadingMessage = <p>Sample size shown: {parseInt(ratio*100).toString()}%</p>
+        loadingMessage = <div class="alert alert-success" role="alert">
+                            <strong>Found some properties!</strong> Sample size shown: {parseInt(ratio*100).toString()}% 
+                          </div>
       } else {
-        loadingMessage = <p>No records found.</p>
+        loadingMessage = <div class="alert alert-danger alert-dismissible" role="alert">
+                          <strong>Oh crumbs!</strong> We didnt find any properties. Try changing the filters above.
+                          </div>
       }
     }
     return (<div id="controls" class="row">
