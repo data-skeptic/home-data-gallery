@@ -75,24 +75,27 @@ export default class Controls extends React.Component {
           <Slider title='sq.ft.' min_value={0} max_value={10000} low={this.props.searchCriteria.sqft[0]} high={this.props.searchCriteria.sqft[1]} onUpdate={this.onUpdate.bind(this, 'sqft')} />
         </div>
       </div>
-
+      
       <div class="row">
-        <div class="form-inline">
-          <label for="cURL_textbox">cURL Request</label>
-          <input type="text" class="form-control" id="cURL_textbox" value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})} />
-          <CopyToClipboard text={this.state.value}
-              onCopy={() => this.setState({copied: true})}>
-              <button><img src="copy.png" id='copyPng' alt="Copy to clipboard" /></button>
-            </CopyToClipboard>
-            {this.state.copied ? <span style={{color: 'red'}}>Copied.</span> : null}
-        </div>
+        <form class="form-inline">
+          <div class="form-group">
+            <label for="cURL_textbox">cURL Request</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="cURL_textbox" value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})}/>
+              <div class="input-group-addon">
+              <CopyToClipboard text={this.state.value} onCopy={() => this.setState({copied: true})}>
+              <buton>Copy <img src="copy.png" id='copyPng' alt="Copy to clipboard" /></buton>
+                </CopyToClipboard>
+              </div>
+            </div>
+          </div>
+          {this.state.copied ? <span style={{color: 'red'}}> Copied.</span> : null}
+        </form>
       </div>
 
       <div class="row">
-        {this.props.network_ok ?  <div class="alert alert-danger alert-dismissible" role="alert">
         {this.props.network_ok ? "" : <div class="alert alert-danger alert-dismissible" role="alert">
                                       <strong>Houston we have a problem!</strong> Cannot connect to Open House Project API.
-                                    </div>: ""}
                                     </div>}
         {loadingMessage}
       </div>
