@@ -73,6 +73,9 @@ body {
 #rowOneLeft {
 }
 
+#filters {
+  padding: 1.5rem;
+}
 .col-sm-6 {
   overflow: hidden;
   height: 90px;
