@@ -56,31 +56,44 @@ export default class Controls extends React.Component {
                           </div>
       }
     }
-    return (<div id="controls" class="row">
-              <div class="col-sm-3">
-          			<Slider title='Beds' min_value={0} max_value={10} low={this.props.searchCriteria.bedrooms[0]} high={this.props.searchCriteria.bedrooms[1]} onUpdate={this.onUpdate.bind(this, 'bedrooms')} />
-          			<Slider title='Bath' min_value={0} max_value={10} low={this.props.searchCriteria.bathrooms[0]} high={this.props.searchCriteria.bathrooms[1]} onUpdate={this.onUpdate.bind(this, 'bathrooms')} />
-              </div>
-              <div class="col-sm-3">
-          			<Slider title='Price' min_value={0} max_value={10000000} low={this.props.searchCriteria.price[0]} high={this.props.searchCriteria.price[1]} onUpdate={this.onUpdate.bind(this, 'price')} />
-          			<Slider title='sq.ft.' min_value={0} max_value={10000} low={this.props.searchCriteria.sqft[0]} high={this.props.searchCriteria.sqft[1]} onUpdate={this.onUpdate.bind(this, 'sqft')} />
-              </div>
-              <div class="col-sm-6">
-              {this.props.network_ok ? "": "Network issues!"}
-                {loadingMessage}
-                {this.props.busy | this.props.changed ? <img src="box.gif" width="60" />: ""}
-                <div id='curlBox'>
-                  <span class="ui_label">cURL request: </span>
-                  <input class='curl' value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})} />&nbsp;
+    return (
+<div>
+  <div id="filters" class="container">
+      <h3>Filters</h3>
+      <div class="row">
+        <div class="col-sm-4">
+          <p>Number of bedrooms</p>
+          <Slider title='Beds' min_value={0} max_value={10} low={this.props.searchCriteria.bedrooms[0]} high={this.props.searchCriteria.bedrooms[1]} onUpdate={this.onUpdate.bind(this, 'bedrooms')} />
+          <p>Number of bathrooms</p>
+          <Slider title='Bath' min_value={0} max_value={10} low={this.props.searchCriteria.bathrooms[0]} high={this.props.searchCriteria.bathrooms[1]} onUpdate={this.onUpdate.bind(this, 'bathrooms')} />
+        </div>
 
-                  <CopyToClipboard text={this.state.value}
-                    onCopy={() => this.setState({copied: true})}>
-                    <button><img src="copy.png" id='copyPng' alt="Copy to clipboard" /></button>
-                  </CopyToClipboard>&nbsp;
+        <div class="col-sm-4">
+          <p>Price</p>
+          <Slider title='Price' min_value={0} max_value={10000000} low={this.props.searchCriteria.price[0]} high={this.props.searchCriteria.price[1]} onUpdate={this.onUpdate.bind(this, 'price')} />
+          <p>Area (Sq.Ft)</p>
+          <Slider title='sq.ft.' min_value={0} max_value={10000} low={this.props.searchCriteria.sqft[0]} high={this.props.searchCriteria.sqft[1]} onUpdate={this.onUpdate.bind(this, 'sqft')} />
+        </div>
+      </div>
 
-                  {this.state.copied ? <span style={{color: 'red'}}>Copied.</span> : null}
-                </div>
-              </div>
-         </div>)
+      <div class="row">
+        <div class="form-inline">
+          <label for="cURL_textbox">cURL Request</label>
+          <input type="text" class="form-control" id="cURL_textbox" value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})} />
+          <CopyToClipboard text={this.state.value}
+              onCopy={() => this.setState({copied: true})}>
+              <button><img src="copy.png" id='copyPng' alt="Copy to clipboard" /></button>
+            </CopyToClipboard>
+            {this.state.copied ? <span style={{color: 'red'}}>Copied.</span> : null}
+        </div>
+      </div>
+
+      <div class="row">
+        {this.props.network_ok ? "": "Network issues!"}
+        {loadingMessage}
+      </div>
+    </div>
+</div>
+   )
   }
 }
