@@ -89,7 +89,9 @@ export default class Controls extends React.Component {
       </div>
 
       <div class="row">
-        {this.props.network_ok ? "": "Network issues!"}
+        {this.props.network_ok ?  <div class="alert alert-danger alert-dismissible" role="alert">
+                                      <strong>Houston we have a problem!</strong> Cannot connect to Open House Project API.
+                                    </div>: ""}
         {loadingMessage}
       </div>
     </div>
