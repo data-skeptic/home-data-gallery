@@ -46,10 +46,7 @@ export default class DataTable extends React.Component {
 
     var columns = [
         {key: 'listing_timestamp', label: 'Timestamp'},
-        {key: 'listing_type', label: 'Type', cell: function( item, columnKey ) {
-          // TODO: use this template to make the columns more interesting
-          return <span style={{color: 'black'}}>{item.listing_type}</span>
-        }},
+        {key: 'listing_type', label: 'Type'},
         {key: 'price', label: 'Price'},
         {key: 'bedrooms', label: 'Bedrooms'},
         {key: 'bathrooms', label: 'Bathrooms'},
@@ -58,7 +55,7 @@ export default class DataTable extends React.Component {
     ]
 
     return <JsonTable
-      className={ "table table-striped table-hover table-sm" }
+      className={ "table table-striped table-hover table-sm table-bordered" }
       rows={ listings }
       columns={ columns }
       settings={ this.getSettings() }
