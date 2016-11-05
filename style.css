@@ -70,22 +70,17 @@ body {
   font-weight: bold;
 }
 
+#mapAndPlotRow {
+  padding-right: 5em;*/
+}
+
 #rowOneLeft {
 }
 
 #filters {
   padding: 1.5rem;
 }
-.col-sm-6 {
-  overflow: hidden;
-  height: 90px;
-}
 
-.col-md-6 {
-  margin-left: 400px;
-  min-width: 300px;
-  width: 50%;
-}
 
 #rowOne {
   display: flex;
@@ -188,20 +183,9 @@ body {
   font-weight: bold;
 }
 
-#map1 {
-  position: absolute;
-  height: 300px;
-  width: 400px;
-}
-
 .the-map {
-  position: absolute;
   height: 300px;
   width: 400px;
-}
-
-.leaflet-container {
-  position: absolute;
 }
 
 /*********************************************************

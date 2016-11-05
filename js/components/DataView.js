@@ -20,29 +20,25 @@ export default class DataView extends React.Component {
 			}
 			else {
 				plotArea = (
-					<div class="col-md-6">
-						<div id="rowOneRight">
 							<Plots listings={this.props.listings} />
-						</div>
-					</div>
 				)
 			}
 		}
 		return (
-    		<div id="tabs">
-    			<div id="rowOne">
-    				<div id="rowOneLeft">
-    					<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />
-    				</div>
-    				<div id="rowOneRight">
-    					{plotArea}
+				<div class="container">
+					<div id="mapAndPlotRow" class="row clearfix">
+						<div class="col-md-5 float-xs-left">
+							<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />    				
+						</div>		
+
+						<div class="col-md-5 float-xs-right">
+							{plotArea}
+						</div>
 					</div>
-    			</div>
-				<div class="clear"></div>
-    			<div>
-	    			<DataTable listings={this.props.listings} />
-    			</div>
-           </div>
+					<div class="row">
+						<DataTable listings={this.props.listings} />
+					</div>
+				</div>
 		)
 	}
 }
