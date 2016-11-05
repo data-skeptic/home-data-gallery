@@ -77,9 +77,9 @@ export default class Controls extends React.Component {
       </div>
       
       <div class="row">
-        <form class="form-inline">
+        <form class="form">
           <div class="form-group">
-            <label for="cURL_textbox">cURL Request</label>
+            <label for="cURL_textbox">cURL Request: </label>
             <div class="input-group">
               <input type="text" class="form-control" id="cURL_textbox" value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})}/>
               <div class="input-group-addon">
