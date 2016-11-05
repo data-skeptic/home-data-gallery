@@ -55,7 +55,7 @@ export default class DataTable extends React.Component {
     ]
 
     return <JsonTable
-      className={ "table table-striped table-hover table-sm table-bordered" }
+      className={ "table table-striped table-hover table-sm" }
       rows={ listings }
       columns={ columns }
       settings={ this.getSettings() }
