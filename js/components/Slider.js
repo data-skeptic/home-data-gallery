@@ -54,10 +54,11 @@ export default class Slider extends React.Component {
 				   allowCross={false}
 				   range={true}
 				   defaultValue={defVal}
+				   tipFormatter={null}
 				   onChange={this.onPartialUpdate.bind(this)}
 				   onAfterChange={this.onUpdate.bind(this)}
 				  />
-      		<center><span class='slider_label'>{this.props.title}: {low_label} to {high_label}</span></center>
+      		<p class="text-xs-center slider_label">{low_label} to {high_label}</p>
            </div>)
 	}
 }

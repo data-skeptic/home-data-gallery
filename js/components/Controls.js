@@ -33,44 +33,74 @@ export default class Controls extends React.Component {
     var loadingMessage = <p>Loading...</p>
     if (this.props.busy || this.props.changed) {
       if (this.props.offset == 0 && this.props.count == 1) {
-        loadingMessage = <p>Looking in this area...</p>
+        loadingMessage = <div class="alert alert-info" role="alert">
+                            <strong>Hang fire a second!</strong> Were looking for properties in this area.
+                            <img src="box.gif" class="float-xs-right" alt="Loading image" width="40"/>
+                          </div>
       }
       else {
-        loadingMessage = <p>Checking for more listings...</p>
+        loadingMessage = <div class="alert alert-info" role="alert">
+                            <strong>Hang fire a second!</strong> Were checking for more listings...
+                            <img src="box.gif" class="float-xs-right" alt="Loading image" width="40"/>
+                          </div>
       }
     } else {
       if (this.props.count > 0) {
         var ratio = 1.0 * this.props.offset / this.props.count
-        loadingMessage = <p>Sample size shown: {parseInt(ratio*100).toString()}%</p>
+        loadingMessage = <div class="alert alert-success" role="alert">
+                            <strong>Found some properties!</strong> Sample size shown: {parseInt(ratio*100).toString()}% 
+                          </div>
       } else {
-        loadingMessage = <p>No records found.</p>
+        loadingMessage = <div class="alert alert-danger alert-dismissible" role="alert">
+                          <strong>Oh crumbs!</strong> We didnt find any properties. Try changing the filters above.
+                          </div>
       }
     }
-    return (<div id="controls" class="row">
-              <div class="col-sm-3">
-          			<Slider title='Beds' min_value={0} max_value={10} low={this.props.searchCriteria.bedrooms[0]} high={this.props.searchCriteria.bedrooms[1]} onUpdate={this.onUpdate.bind(this, 'bedrooms')} />
-          			<Slider title='Bath' min_value={0} max_value={10} low={this.props.searchCriteria.bathrooms[0]} high={this.props.searchCriteria.bathrooms[1]} onUpdate={this.onUpdate.bind(this, 'bathrooms')} />
-              </div>
-              <div class="col-sm-3">
-          			<Slider title='Price' min_value={0} max_value={10000000} low={this.props.searchCriteria.price[0]} high={this.props.searchCriteria.price[1]} onUpdate={this.onUpdate.bind(this, 'price')} />
-          			<Slider title='sq.ft.' min_value={0} max_value={10000} low={this.props.searchCriteria.sqft[0]} high={this.props.searchCriteria.sqft[1]} onUpdate={this.onUpdate.bind(this, 'sqft')} />
-              </div>
-              <div class="col-sm-6">
-              {this.props.network_ok ? "": "Network issues!"}
-                {loadingMessage}
-                {this.props.busy | this.props.changed ? <img src="box.gif" width="60" />: ""}
-                <div id='curlBox'>
-                  <span class="ui_label">cURL request: </span>
-                  <input class='curl' value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})} />&nbsp;
+    return (
+<div>
+  <div id="filters" class="container">
+      <h3>Filters</h3>
+      <div class="row">
+        <div class="col-sm-4">
+          <p>Number of bedrooms</p>
+          <Slider title='Beds' min_value={0} max_value={10} low={this.props.searchCriteria.bedrooms[0]} high={this.props.searchCriteria.bedrooms[1]} onUpdate={this.onUpdate.bind(this, 'bedrooms')} />
+          <p>Number of bathrooms</p>
+          <Slider title='Bath' min_value={0} max_value={10} low={this.props.searchCriteria.bathrooms[0]} high={this.props.searchCriteria.bathrooms[1]} onUpdate={this.onUpdate.bind(this, 'bathrooms')} />
+        </div>
 
-                  <CopyToClipboard text={this.state.value}
-                    onCopy={() => this.setState({copied: true})}>
-                    <button><img src="copy.png" id='copyPng' alt="Copy to clipboard" /></button>
-                  </CopyToClipboard>&nbsp;
-
-                  {this.state.copied ? <span style={{color: 'red'}}>Copied.</span> : null}
-                </div>
+        <div class="col-sm-4">
+          <p>Price</p>
+          <Slider title='Price' min_value={0} max_value={10000000} low={this.props.searchCriteria.price[0]} high={this.props.searchCriteria.price[1]} onUpdate={this.onUpdate.bind(this, 'price')} />
+          <p>Area (Sq.Ft)</p>
+          <Slider title='sq.ft.' min_value={0} max_value={10000} low={this.props.searchCriteria.sqft[0]} high={this.props.searchCriteria.sqft[1]} onUpdate={this.onUpdate.bind(this, 'sqft')} />
+        </div>
+      </div>
+      
+      <div class="row">
+        <form class="form">
+          <div class="form-group">
+            <label for="cURL_textbox">cURL Request: </label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="cURL_textbox" value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})}/>
+              <div class="input-group-addon">
+              <CopyToClipboard text={this.state.value} onCopy={() => this.setState({copied: true})}>
+              <buton>Copy <img src="copy.png" id='copyPng' alt="Copy to clipboard" /></buton>
+                </CopyToClipboard>
               </div>
-         </div>)
+            </div>
+          </div>
+          {this.state.copied ? <span style={{color: 'red'}}> Copied.</span> : null}
+        </form>
+      </div>
+
+      <div class="row">
+        {this.props.network_ok ? "" : <div class="alert alert-danger alert-dismissible" role="alert">
+                                      <strong>Houston we have a problem!</strong> Cannot connect to Open House Project API.
+                                    </div>}
+        {loadingMessage}
+      </div>
+    </div>
+</div>
+   )
   }
 }

@@ -70,19 +70,17 @@ body {
   font-weight: bold;
 }
 
+#mapAndPlotRow {
+  padding-right: 5em;*/
+}
+
 #rowOneLeft {
 }
 
-.col-sm-6 {
-  overflow: hidden;
-  height: 90px;
+#filters {
+  padding: 1.5rem;
 }
 
-.col-md-6 {
-  margin-left: 400px;
-  min-width: 300px;
-  width: 50%;
-}
 
 #rowOne {
   display: flex;
@@ -95,9 +93,6 @@ body {
   flex-flow: row wrap;
 }
 
-.btn {
-    height: 15px;
-}
 
 #btnCopy {
     width: 25px;
@@ -127,10 +122,6 @@ body {
   height: 300px;
   margin-bottom: 5px;
   flex-flow: row wrap;
-}
-
-.btn {
-    height: 15px;
 }
 
 #btnCopy {
@@ -150,7 +141,7 @@ body {
 /*********************************************************
   DATA TABLE
 **********************************************************/
-
+/*
 .jsonTable {
 }
 
@@ -176,7 +167,7 @@ body {
 .jsonEven {
   background-color: #efefef;
 }
-
+*/
 /*********************************************************
   MAP
 **********************************************************/
@@ -185,20 +176,9 @@ body {
   font-weight: bold;
 }
 
-#map1 {
-  position: absolute;
-  height: 300px;
-  width: 400px;
-}
-
 .the-map {
-  position: absolute;
   height: 300px;
   width: 400px;
-}
-
-.leaflet-container {
-  position: absolute;
 }
 
 /*********************************************************
@@ -216,7 +196,6 @@ body {
   width: 400px;
   height: 300px;
   padding: 10px;
-  margin-left: 405px;
 }
 
 .Plots {
@@ -257,7 +236,7 @@ body {
 .slider {
   margin-bottom: 5px;
   margin-left: 10px;
-  width: 175px;
+  width: 200px;
   height: 40px;
 }
 .slider_vals {
@@ -277,6 +256,7 @@ body {
 
 
 .rc-slider {
+  margin-bottom: .5rem;
   position: relative;
   height: 4px;
   width: 100%;

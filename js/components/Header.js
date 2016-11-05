@@ -4,16 +4,15 @@ import ReactDOM from "react-dom";
 export default class Header extends React.Component {
 
 	render() {
-		return (<div id="header">
-					<div id="logo">
-					<img id="logo-img" src="/img/dshs.png" />
-					</div>
-					<div id="title">OpenHouse Project (alpha release)</div>
-					<div class="tooltip">
-						<img id="info-img" src="/img/info.png" />
-						<span class="tooltiptext">Tooltip text</span>
-					</div>
-				</div>
+		return (
+<div id="header">
+	<nav class="navbar navbar-dark bg-inverse">
+		<a class="navbar-brand" href="#">
+			<img src="/img/dshs.png" width="30" height="30" alt="OpenHouse Project Logo" />
+			OpenHouse Project (Alpha Release)
+		</a>
+	</nav>
+</div>
 		)
 	}
 }
