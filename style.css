@@ -93,9 +93,6 @@ body {
   flex-flow: row wrap;
 }
 
-.btn {
-    height: 15px;
-}
 
 #btnCopy {
     width: 25px;
@@ -125,10 +122,6 @@ body {
   height: 300px;
   margin-bottom: 5px;
   flex-flow: row wrap;
-}
-
-.btn {
-    height: 15px;
 }
 
 #btnCopy {
