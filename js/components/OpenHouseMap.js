@@ -35,7 +35,11 @@ export default class OpenHouseMap extends React.Component {
               return (
                 <Marker position={p}>
                   <Popup>
-                    <span>A pretty CSS3 popup. <br/> Easily customizable.</span>
+                    <span><strong>{listing.address_object.formatted_address}</strong><br/>
+                          <strong>Price:</strong> {listing.price}<br/>
+                          <strong>Sq.ft:</strong> {listing.building_size}<br/>
+                          <strong>Timestamp: </strong>{listing.listing_timestamp.substring(0, 10)}
+                    </span>
                   </Popup>
                 </Marker>
               )
