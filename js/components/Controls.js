@@ -34,13 +34,13 @@ export default class Controls extends React.Component {
     if (this.props.busy || this.props.changed) {
       if (this.props.offset == 0 && this.props.count == 1) {
         loadingMessage = <div class="alert alert-info" role="alert">
-                            <strong>Hang fire a second!</strong> Were looking for properties in this area.
+                            <strong>Hang fire a second!</strong> We&apos;re looking for properties in this area.
                             <img src="box.gif" class="float-xs-right" alt="Loading image" width="40"/>
                           </div>
       }
       else {
         loadingMessage = <div class="alert alert-info" role="alert">
-                            <strong>Hang fire a second!</strong> Were checking for more listings...
+                            <strong>Hang fire a second!</strong> We&apos;re checking for more listings...
                             <img src="box.gif" class="float-xs-right" alt="Loading image" width="40"/>
                           </div>
       }
