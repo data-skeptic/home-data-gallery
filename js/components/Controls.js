@@ -90,8 +90,14 @@ export default class Controls extends React.Component {
             </div>
             {this.state.copied ? <span style={{color: 'red'}}> Copied.</span> : null}
           </form>
+          <pre class="rfiddleHelper" hidden>{`# Pull in the rjson library to parse the JSON output from the OpenHouseProject API
+library("rjson")
 
-          <a class="btn btn-primary" href="http://r-fiddle.org/#/query/embed?code=Testcode">Open dataset in R-Fiddle</a>
+# Fetch the json data the API
+json_data <- fromJSON(file="{this.state.value}")
+`}
+          </pre>
+          <a class="btn btn-primary" href={"http://www.r-fiddle.org/#/query/fiddle?code=" + encodeURIComponent($('pre.rfiddleHelper').text())} target="_blank">Open dataset in R-Fiddle</a>
         </div>
       </div>
 
