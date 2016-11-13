@@ -90,11 +90,25 @@ export default class Controls extends React.Component {
             </div>
             {this.state.copied ? <span style={{color: 'red'}}> Copied.</span> : null}
           </form>
-          <pre class="rfiddleHelper" hidden>{`# Pull in the rjson library to parse the JSON output from the OpenHouseProject API
+          <pre class="rfiddleHelper" hidden>
+{`# Pull in the rjson library to parse the JSON output from the OpenHouseProject API
 library("rjson")
 
 # Fetch the json data the API
-json_data <- fromJSON(file="` + this.state.value + `")
+json_data <- fromJSON(file="` + 
+this.state.value + 
+`")
+
+#Mold this into a data frame
+properties_frame <- lapply(json_data$results, function(x) {
+  x[sapply(x, is.null)] <- NA
+  unlist(x)
+})
+properties <- do.call("rbind", properties_frame)
+
+# Grab the prices as numeric type and plot a basic histogram on the data
+prices <- as.numeric(as.character(properties[,19]))
+hist(prices)
 `}
           </pre>
           <a class="btn btn-primary" href={"http://www.r-fiddle.org/#/query/fiddle?code=" + encodeURIComponent($('pre.rfiddleHelper').text())} target="_blank">Open dataset in R-Fiddle</a>
