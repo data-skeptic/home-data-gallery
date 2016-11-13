@@ -94,7 +94,7 @@ export default class Controls extends React.Component {
 library("rjson")
 
 # Fetch the json data the API
-json_data <- fromJSON(file="{this.state.value}")
+json_data <- fromJSON(file="` + this.state.value + `")
 `}
           </pre>
           <a class="btn btn-primary" href={"http://www.r-fiddle.org/#/query/fiddle?code=" + encodeURIComponent($('pre.rfiddleHelper').text())} target="_blank">Open dataset in R-Fiddle</a>
