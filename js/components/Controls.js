@@ -74,23 +74,25 @@ export default class Controls extends React.Component {
           <p>Area (Sq.Ft)</p>
           <Slider title='sq.ft.' min_value={0} max_value={10000} low={this.props.searchCriteria.sqft[0]} high={this.props.searchCriteria.sqft[1]} onUpdate={this.onUpdate.bind(this, 'sqft')} />
         </div>
-      </div>
-      
-      <div class="row">
-        <form class="form">
-          <div class="form-group">
-            <label for="cURL_textbox">cURL Request: </label>
-            <div class="input-group">
-              <input type="text" class="form-control" id="cURL_textbox" value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})}/>
-              <div class="input-group-addon">
-              <CopyToClipboard text={this.state.value} onCopy={() => this.setState({copied: true})}>
-              <buton>Copy <img src="copy.png" id='copyPng' alt="Copy to clipboard" /></buton>
-                </CopyToClipboard>
+
+        <div class="col-sm-4">
+          <form class="form">
+            <div class="form-group">
+              <label for="cURL_textbox">cURL Request: </label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="cURL_textbox" value={this.state.value} onChange={({target: {value}}) => this.setState({value, copied: false})}/>
+                <div class="input-group-addon">
+                <CopyToClipboard text={this.state.value} onCopy={() => this.setState({copied: true})}>
+                <buton>Copy <img src="copy.png" id='copyPng' alt="Copy to clipboard" /></buton>
+                  </CopyToClipboard>
+                </div>
               </div>
             </div>
-          </div>
-          {this.state.copied ? <span style={{color: 'red'}}> Copied.</span> : null}
-        </form>
+            {this.state.copied ? <span style={{color: 'red'}}> Copied.</span> : null}
+          </form>
+
+          <a class="btn btn-primary" href="http://r-fiddle.org/#/query/embed?code=Testcode">Open dataset in R-Fiddle</a>
+        </div>
       </div>
 
       <div class="row">
