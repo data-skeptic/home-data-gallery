@@ -6,6 +6,16 @@ export default class OpenHouseMap extends React.Component {
   constructor() {
     super()
     this.handleMoveend = this.handleMoveend.bind(this)
+    this.themap = undefined
+  }
+
+  componentDidMount() {
+    var map = this.themap.leafletElement
+    var c = map.getCenter()
+    var z = map.getZoom()
+    var b = map.getBounds()
+    var p = {latitude: c.lat, longitude: c.lng}
+    this.props.setPositionAndZoom(p, z, b)
   }
 
   handleMoveend(e) {
@@ -21,7 +31,8 @@ export default class OpenHouseMap extends React.Component {
     var listings = this.props.listings
     const position = [this.props.position.latitude, this.props.position.longitude]
     return (
-      <Map 
+      <Map
+        ref={(map) => { this.themap = map; }}
         class="the-map"
         onMoveend={this.handleMoveend}
         center={position}
@@ -31,16 +42,23 @@ export default class OpenHouseMap extends React.Component {
             url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
           />
           {listings.map(function(listing) {
-              var p = [listing.latitude, listing.longitude]
+            var ao = listing.address_object
+            if (ao != undefined) {
+              var p = [ao.latitude, ao.longitude]
               return (
-                <Marker position={p}>
+                <Marker key={listing.id} position={p}>
                   <Popup>
-                    <span>A pretty CSS3 popup. <br/> Easily customizable.</span>
+                    <span><strong>{listing.address_object.formatted_address}</strong><br/>
+                          <strong>Price:</strong> {listing.price}<br/>
+                          <strong>Sq.ft:</strong> {listing.building_size}<br/>
+                          <strong>Timestamp: </strong>{listing.listing_timestamp.substring(0, 10)}
+                    </span>
                   </Popup>
                 </Marker>
-              )
+              )              
+            }
           })}
       </Map>
-    );
+    )
   }
 }

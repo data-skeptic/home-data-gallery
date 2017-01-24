@@ -4,16 +4,19 @@ import ReactDOM from "react-dom";
 export default class Header extends React.Component {
 
 	render() {
-		return (<div id="header">
-					<div id="logo">
-					<img id="logo-img" src="/img/dshs.png" />
-					</div>
-					<div id="title">OpenHouse Project (alpha release)</div>
-					<div class="tooltip">
-						<img id="info-img" src="/img/info.png" />
-						<span class="tooltiptext">Tooltip text</span>
-					</div>
-				</div>
+		return (
+<div className="header">
+	<nav className="navbar navbar-dark bg-inverse">
+		<a className="navbar-brand" href="#">
+			<img src="/img/dshs.png" width="30" height="30" alt="OpenHouse Project Logo" />
+			OpenHouse Project (Alpha Release)
+		</a>
+		<span class="field-tip">
+		    About
+		    <span class="tip-content">OpenHouse accepts user submissions of data.  We do our best to validate, but no guarentee about the accuracy of the data is made.  If you find a correction, please let us know!</span>
+		</span>    
+	</nav>
+</div>
 		)
 	}
 }

@@ -6,15 +6,60 @@ body {
   margin: 0px;
 }
 
-
 /*********************************************************
-  TOP SECTION OF PAGE
+  Header.js
 **********************************************************/
 
-#header {
+.header {
   background-color: #333;
   clear: both;
 }
+
+.field-tip {
+    position:relative;
+    font-size: 10pt;
+    cursor:help;
+    color: #aaa;
+}
+    .field-tip .tip-content {
+        position:absolute;
+        top:-10px; /* - top padding */
+        right:9999px;
+        width:400px;
+        font-size: 10pt;
+        line-height: 12pt;
+        margin-right:-220px; /* width + left/right padding */
+        padding:10px;
+        color:#eee;
+        background:#666;
+        opacity:0;
+        -webkit-transition:opacity 250ms ease-out;
+           -moz-transition:opacity 250ms ease-out;
+            -ms-transition:opacity 250ms ease-out;
+             -o-transition:opacity 250ms ease-out;
+                transition:opacity 250ms ease-out;
+    }
+        /* <http://css-tricks.com/snippets/css/css-triangle/> */
+        .field-tip .tip-content:before {
+            content:' '; /* Must have content to display */
+            position:absolute;
+            top:50%;
+            left:-16px; /* 2 x border width */
+            width:0;
+            height:0;
+            margin-top:-8px; /* - border width */
+            border:8px solid transparent;
+            border-right-color:#333;
+        }
+        .field-tip:hover .tip-content {
+            right:-20px;
+            opacity:1;
+        }
+
+        
+/*********************************************************
+  TOP SECTION OF PAGE
+**********************************************************/
 
 #controls {
   padding: 10px;
@@ -70,19 +115,17 @@ body {
   font-weight: bold;
 }
 
+#mapAndPlotRow {
+  padding-right: 5em;*/
+}
+
 #rowOneLeft {
 }
 
-.col-sm-6 {
-  overflow: hidden;
-  height: 90px;
+#filters {
+  padding: 1.5rem;
 }
 
-.col-md-6 {
-  margin-left: 400px;
-  min-width: 300px;
-  width: 50%;
-}
 
 #rowOne {
   display: flex;
@@ -95,9 +138,6 @@ body {
   flex-flow: row wrap;
 }
 
-.btn {
-    height: 15px;
-}
 
 #btnCopy {
     width: 25px;
@@ -127,10 +167,6 @@ body {
   height: 300px;
   margin-bottom: 5px;
   flex-flow: row wrap;
-}
-
-.btn {
-    height: 15px;
 }
 
 #btnCopy {
@@ -147,10 +183,14 @@ body {
   height: 20px;
 }
 
+.btn-load-more {
+  margin-left: 25px;
+}
+
 /*********************************************************
   DATA TABLE
 **********************************************************/
-
+/*
 .jsonTable {
 }
 
@@ -176,7 +216,7 @@ body {
 .jsonEven {
   background-color: #efefef;
 }
-
+*/
 /*********************************************************
   MAP
 **********************************************************/
@@ -185,20 +225,9 @@ body {
   font-weight: bold;
 }
 
-#map1 {
-  position: absolute;
-  height: 300px;
-  width: 400px;
-}
-
 .the-map {
-  position: absolute;
   height: 300px;
   width: 400px;
-}
-
-.leaflet-container {
-  position: absolute;
 }
 
 /*********************************************************
@@ -216,7 +245,6 @@ body {
   width: 400px;
   height: 300px;
   padding: 10px;
-  margin-left: 405px;
 }
 
 .Plots {
@@ -257,7 +285,7 @@ body {
 .slider {
   margin-bottom: 5px;
   margin-left: 10px;
-  width: 175px;
+  width: 200px;
   height: 40px;
 }
 .slider_vals {
@@ -277,6 +305,7 @@ body {
 
 
 .rc-slider {
+  margin-bottom: .5rem;
   position: relative;
   height: 4px;
   width: 100%;

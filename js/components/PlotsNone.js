@@ -61,40 +61,42 @@ export default class PlotsNone extends Component {
 		}
 				  
 		return (
-			<div class="plots-empty">
-				<span class="plots-empty-title">No properties found</span>
-				<p>OpenHouse does not yet have any property sales data for this area.
-				We're a developing project.  If you know where we might pull from, please
-				let us know in the box below.</p>
-
-				<div id="urlbox">
-				 <span class="plots-empty-title2">Tell us about a website</span>
-
-				  <table>
-				    <tbody>
-					    <tr>
-					      <td>URL:</td>
-					      <td><input id="url" class="box" type="text" value={this.state.url} onChange={this.onUpdate.bind(this)} /></td>
-					    </tr>
-					    <tr>
-					      <td>Email:</td>
-					      <td><input id="email" class="box" type="text" value={this.state.email} onChange={this.onUpdate.bind(this)} /></td>
-					    </tr>
-					    <tr>
-					      <td></td>
-					      <td><input type="checkbox" id="cb_notify" checked={this.state.cb_notify} onChange={this.onUpdate.bind(this)} />Notify me about updates related to this data</td>
-					    </tr>
-					    <tr>
-					      <td></td>
-					      <td>
-					      	<button id="btnSubmit" onClick={this.onSubmit.bind(this)}>Submit</button>
-					      </td>
-					    </tr>
-					</tbody>
-				  </table>
-				  {result}
+				<div class="row">
+					<h4>No properties found!</h4>
+					<p>
+						OpenHouse does not yet have any property sales data for this area.
+						We're a developing project.  <strong>If you know where we might pull from, please
+						let us know in the box below.</strong>
+					</p>
+				    <div class="form-group row">
+				      <label for="email" class="col-sm-2 col-form-label">Email</label>
+				      <div class="col-sm-10">
+				        <input type="email" class="form-control" id="email" placeholder="Email" />
+				      </div>
+				    </div>
+				    <div class="form-group row">
+				      <label for="url" class="col-sm-2 col-form-label">URL</label>
+				      <div class="col-sm-10">
+				        <input type="text" class="form-control" id="url" placeholder="https://" />
+				      </div>
+				    </div>
+				    <div class="form-group row">
+				      <label class="col-sm-2"></label>
+				      <div class="col-sm-10">
+				        <div class="form-check">
+				          <label class="form-check-label">
+				            <input class="form-check-input" type="checkbox" id="cb_notify" checked /> Notify me about updates related to this data
+				          </label>
+				        </div>
+				      </div>
+				    </div>
+				    <div class="form-group row">
+				      <div class="offset-sm-2 col-sm-10">
+				        <button type="submit" class="btn btn-primary" onClick={this.onSubmit.bind(this)}>Submit</button>
+				      </div>
+				      {result}
+				    </div>
 				</div>
-			</div>
     	)
 	}
 }
