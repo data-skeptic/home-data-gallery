@@ -25,17 +25,17 @@ export default class DataView extends React.Component {
 			}
 		}
 		return (
-				<div class="container">
-					<div id="mapAndPlotRow" class="row clearfix">
-						<div class="col-md-5 float-xs-left">
+				<div className="container">
+					<div id="mapAndPlotRow" className="row clearfix">
+						<div className="col-md-5 float-xs-left">
 							<OpenHouseMap listings={this.props.listings} position={this.props.position} zoom={this.props.zoom} setPositionAndZoom={this.props.setPositionAndZoom} />    				
 						</div>		
 
-						<div class="col-md-5 float-xs-right">
+						<div className="col-md-5 float-xs-right">
 							{plotArea}
 						</div>
 					</div>
-					<div class="row">
+					<div className="row">
 						<DataTable listings={this.props.listings} />
 					</div>
 				</div>
