@@ -27,11 +27,15 @@ export default class Controls extends React.Component {
     console.log("Copied to clipboard.")
   }
 
+  onClick() {
+    this.props.loadMore()
+  }
+
 	render() {
     var curl = this.state.curlRequestFn()
     this.state.value = curl
     var loadingMessage = <p>Loading...</p>
-    if (this.props.busy || this.props.changed) {
+    if (this.props.busy || this.props.changed || this.props.first_run) {
       if (this.props.offset == 0 && this.props.count == 1) {
         loadingMessage = <div class="alert alert-info" role="alert">
                             <strong>Hang fire a second!</strong> We&apos;re looking for properties in this area.
@@ -40,16 +44,27 @@ export default class Controls extends React.Component {
       }
       else {
         loadingMessage = <div class="alert alert-info" role="alert">
-                            <strong>Hang fire a second!</strong> We&apos;re checking for more listings...
+                            <strong>Hang fire a second!</strong> We&apos;re searching for additional listings...
                             <img src="box.gif" class="float-xs-right" alt="Loading image" width="40"/>
                           </div>
       }
     } else {
-      if (this.props.count > 0) {
+      if (this.props.nlistings > 0) {
         var ratio = 1.0 * this.props.offset / this.props.count
-        loadingMessage = <div class="alert alert-success" role="alert">
-                            <strong>Found some properties!</strong> Sample size shown: {parseInt(ratio*100).toString()}% 
-                          </div>
+        var sample_size_shown = parseInt(ratio*100).toString()
+        if (ratio < .01) {
+          sample_size_shown = "<1"
+        }
+        if (ratio < 1.0) {
+          loadingMessage = <div class="alert alert-success" role="alert">
+                              <strong>Found some properties!</strong> Sample size shown: {sample_size_shown}% 
+                              <button className="btn-load-more" onClick={this.onClick.bind(this)}>Load more</button>
+                            </div>
+        } else {
+          loadingMessage = <div class="alert alert-success" role="alert">
+                              <strong>Found some properties!</strong> Sample size shown: {sample_size_shown}% 
+                            </div>          
+        }
       } else {
         loadingMessage = <div class="alert alert-danger alert-dismissible" role="alert">
                           <strong>Oh crumbs!</strong> We didnt find any properties. Try changing the filters above.
@@ -59,7 +74,6 @@ export default class Controls extends React.Component {
     return (
 <div>
   <div id="filters" class="container">
-      <h3>Filters</h3>
       <div class="row">
         <div class="col-sm-4">
           <p>Number of bedrooms</p>

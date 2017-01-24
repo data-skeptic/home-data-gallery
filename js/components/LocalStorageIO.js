@@ -1,25 +1,9 @@
 export default class {
 	constructor(local_storage_version) {
 		this.validate(local_storage_version)
-		this.tree = new kdTree([], this.haversineDistance, ["latitude", "longitude"])
-		var keys = Object.keys(localStorage)
-		var cacheSize = 0
-		for (var i=0; i < keys.length; i++) {
-			var key = keys[i]
-			if (key.length > 3 && key.substring(0,3)=="oh-") {
-				var str = localStorage.getItem(key)
-				var elem = JSON.parse(str)
-				if (elem['address_object']) {
-					elem['latitude'] = elem['address_object']['latitude']
-					elem['longitude'] = elem['address_object']['longitude']
-					this.tree.insert(elem)
-					cacheSize += 1				
-				}
-			}
-		}
-		this.state = {local_storage_version}
-		this.haversineDistance = this.haversineDistance.bind(this)
-		console.log("Cache size: " + cacheSize)
+		localStorage.setItem("local_storage_version", local_storage_version)
+		this.local_storage_size = 10000
+		this.listings_dict = {}
 	}
 
 	validate(local_storage_version) {
@@ -61,64 +45,54 @@ export default class {
 		localStorage.setItem("searchCriteria", JSON.stringify(state.searchCriteria))
 		localStorage.setItem("position", JSON.stringify(state.position))
 		localStorage.setItem("zoom", JSON.stringify(state.zoom))
-		localStorage.setItem("local_storage_version", this.state.local_storage_version)
 	}
 
-	readLocalStorage(id) {
-		var elem = localStorage.getItem("oh-" + id)
-		if (elem != undefined) {
-			elem = JSON.parse(elem)
+	update_and_cache(resp, search_criteria, bounds) {
+		var update = this.update_local_cache(search_criteria, bounds)
+		var invisibles = update['invisible']
+
+		// Do we need to clear the cache any?
+		var data = resp['results']
+		var n = update['visible'].length
+		var m = data.length
+		var overage = this.local_storage_size - n - m
+		var i = 0
+		while (i < invisibles.length && overage > 0) {
+			var listing_id = invisibles[i]
+			var listing = this.listings_dict[listing_id]
+			if (!listing.visible) {
+				delete this.listings_dict[listing_id]
+				overage -= 1
+			}
+			i += 1
 		}
-		return elem
-	}
-
-	clearLocalStorage() {
-		this.tree = new kdTree([], this.haversineDistance, ["latitude", "longitude"])
-		localStorage.clear()
-	}
-
-	distance(a, b) {
-	  return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2);
-	}
-
-	haversineDistance(p1, p2, isMiles=1) {
-		function toRad(x) {
-			return x * Math.PI / 180;
+		// loop over new, validate, insert
+		for (var i=0; i < data.length; i++) {
+			var listing = data[i]
+			var listing_id = listing['id']
+			var visible = true
+			if (bounds == undefined) {
+				visible = true
+			} else if (!this.inBounds(listing, bounds)) {
+				visible = false
+			}
+			if (!this.meetsCriteria(listing, search_criteria)) {
+				visible = false
+				console.log("wrong crit")
+			}
+			listing['visible'] = visible
+			this.listings_dict[listing_id] = listing
 		}
-		var lat1 = p1['latitude']
-		if (lat1 == undefined && p1['address_object'] != undefined)
-			lat1 = p1['address_object']['latitude']
-		var lon1 = p1['longitude']
-		if (lon1 == undefined && p1['address_object'] != undefined)
-			lon1 = p1['address_object']['longitude']
-
-		if (lat1 == undefined || lon1 == undefined) {
-			return 99999999
+		var listing_ids = Object.keys(this.listings_dict)
+		var listings = []
+		for (var i=0; i < listing_ids.length; i++) {
+			var listing_id = listing_ids[i]
+			var listing = this.listings_dict[listing_id]
+			if (listing.visible) {
+				listings.push(listing)
+			}
 		}
-
-		var lat2 = p2['latitude']
-		if (lat2 == undefined && p2['address_object'] != undefined)
-			lat2 = p2['address_object']['latitude']
-		var lon2 = p2['longitude']
-		if (lon2 == undefined && p2['address_object'] != undefined)
-			lon2 = p2['address_object']['longitude']
-
-		if (lat2 == undefined || lon2 == undefined) {
-			return 99999999
-		}
-
-		var R = 6371; // km
-		var x1 = lat2 - lat1;
-		var dLat = toRad(x1);
-		var x2 = lon2 - lon1;
-		var dLon = toRad(x2)
-		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-		Math.sin(dLon / 2) * Math.sin(dLon / 2);
-		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		var d = R * c;
-		if(isMiles) d /= 1.60934;
-		return d;
+		return listings
 	}
 
 	isBetween(x, a, b) {
@@ -129,137 +103,76 @@ export default class {
 		return false
 	}
 
-	isInside(lat, lon, bbox) {
-	  if (lat == null || lon == null) {
-	    return false
-	  }
-	  var lat1 = bbox.left
-	  var lon1 = bbox.bottom
-	  var lat2 = bbox.right
-	  var lon2 = bbox.top
-	  var a = this.isBetween(lat, lat1, lat2)
-	  var b = this.isBetween(lon, lon1, lon2)
-	  if (a && b) {
-	  	return true
-	  }
-	  return false
+	inBounds(listing, bbox) {
+		var lat = null
+		var lon = null
+		var ao = listing.address_object
+		if (ao != undefined) {
+			lat = ao.latitude
+			lon = ao.longitude
+		}
+		if (lat == null || lon == null) {
+			return false
+		}
+		var lat1 = bbox.left
+		var lon1 = bbox.bottom
+		var lat2 = bbox.right
+		var lon2 = bbox.top
+		var a = this.isBetween(lat, lat1, lat2)
+		var b = this.isBetween(lon, lon1, lon2)
+		if (a && b) {
+			return true
+		}
+		return false
 	}
 
-	readPropertiesFromLocalStorage(position, zoom, bounds, filters) {
-		var clat = position.latitude
-		var clon = position.longitude
-		var corner = {latitude: bounds.left, longitude: bounds.top}
-		var radius_miles = this.haversineDistance(position, corner)
-		// TODO: revisit this 500
-		var n = 500
-		var kdmatches = this.tree.nearest({"latitude": clat, "longitude": clon}, n, radius_miles)
-
-		// Trim radius result down to viewport
-		var cmatches = []
-		for (var i=0; i < kdmatches.length; i++) {
-			var match = kdmatches[i][0]
-			if (this.isInside(match['latitude'], match['longitude'], bounds)) {
-				cmatches.push(match)
-			}
+	meetsCriteria(listing, search_criteria) {
+		var price = listing.price
+		var bedrooms = listing.bedrooms
+		var bathrooms = listing.bathrooms
+		var sqft = listing.building_size
+		if (!this.isBetween(price, search_criteria.price[0], search_criteria.price[1])) {
+			return false
 		}
-
-		var matches = []
-		var filterAttributes = Object.keys(filters)
-		for (var i=0; i < cmatches.length; i++) {
-			var cmatch = cmatches[i]
-			var filterMatch = true
-			for (var j=0; j < filterAttributes.length; j++) {
-				var kkey = filterAttributes[j]
-				var valid_key = true
-				var min = true
-				var key = ''
-				if (kkey.startsWith('min_')) {
-					key = kkey.substring(4, kkey.length)
-				}
-				else if (kkey.startsWith('max_')) {
-					key = kkey.substring(4, kkey.length)
-					min = false
-				}
-				else {
-					valid_key = false
-				}
-				if (valid_key) {
-					var val = cmatch[key]
-					if (val == undefined) {
-						filterMatch = false
-					}
-					else {
-						if (min) {
-							if (val < filters[kkey]) {
-								filterMatch = false
-							}
-						} else {
-							if (val > filters[kkey]) {
-								filterMatch = false
-							}
-						}
-					}
-				}
-			}
-			if (filterMatch) {
-				matches.push(cmatch)
-			}
+		if (!this.isBetween(bedrooms, search_criteria.bathrooms[0], search_criteria.bedrooms[1])) {
+			return false
 		}
-		return matches
+		if (!this.isBetween(bathrooms, search_criteria.bedrooms[0], search_criteria.bathrooms[1])) {
+			return false
+		}
+		if (!this.isBetween(sqft, search_criteria.sqft[0], search_criteria.sqft[1])) {
+			return false
+		}
+		return true
 	}
 
-	writeLocalStorage(response) {
-		var data = response['results']
-		var failCount = 0
-		if (data.length > 0) {
-			for (var i=0; i < data.length; i++) {
-		  		var elem = data[i]
-				if (elem['address_object'] != undefined) {
-			        var toCache = elem
-			        toCache["latitude"] = toCache['address_object']['latitude']
-			        toCache["longitude"] = toCache['address_object']['longitude']
-
-			        // Save data element to cache by element id
-			        var point = {"latitude": toCache['address_object']['latitude'], "longitude": toCache['address_object']['longitude']}
-			        var dupes = this.tree.nearest(point, 9999, 1)
-			        for (var j=0; j < dupes.length; j++) {
-			        	var dwrap = dupes[j]
-						var dupe = dwrap[0]
-						if (dupe['id'] == elem['id']) {
-			            	this.tree.remove(dupe)
-				        }
-			        }
-
-			        // Save element to `localStore` to be more persistent
-			        try {
-				        this.tree.insert(toCache)
-			         	localStorage.setItem("oh-" + elem['id'], JSON.stringify(toCache))
-			        } catch (err) {
-			        	if (err.name == "QuotaExceededError") {
-			            	console.log("Quota issue")
-			            	var n = 500
-			            	var clat = -1 * toCache['latitude']
-			            	var clon = -1 * toCache['longitude']
-			            	var radius_miles = 24901 * 1.1
-			            	var evictions = this.tree.nearest({"latitude": clat, "longitude": clon}, n, radius_miles)
-			            	for (var k=0; k < evictions.length; k++) {
-			            		var eviction = evictions[k]
-			            		this.tree.remove(eviction[0])
-			            		localStorage.removeItem("oh-" + eviction["id"])
-			            	}
-			            	i -= 1
-			            	failCount += 1
-			            	if (failCount == 3) {
-			            		console.log("Hard reset on local cache")
-			            		localStorage.clear()
-			            		i = 0
-			            	}
-			          	} else {
-			            	console.log(err)
-			          	}
-			        }
-			    }
-		    }
+	update_local_cache(searchCriteria, bounds) {
+		// loop over dict, update by criteria and bounds
+		var listing_ids = Object.keys(this.listings_dict)
+		var visible = []
+		var invisible = []
+		for (var i=0; i < listing_ids.length; i++) {
+			var listing_id = listing_ids[i]
+			var listing = this.listings_dict[listing_id]
+			var v = true
+			if (bounds == undefined) {
+				v = true
+			} else if (!this.inBounds(listing, bounds)) {
+				v = false
+			}
+			if (!this.meetsCriteria(listing, searchCriteria)) {
+				v = false
+			}
+			listing['visible'] = v
+			this.listings_dict[listing_id] = listing
+			if (v) {
+				visible.push(listing)
+			} else {
+				invisible.push(listing_id)
+			}
 		}
+		var update = {visible, invisible}
+		return update
 	}
+
 }

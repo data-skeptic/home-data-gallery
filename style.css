@@ -6,15 +6,60 @@ body {
   margin: 0px;
 }
 
-
 /*********************************************************
-  TOP SECTION OF PAGE
+  Header.js
 **********************************************************/
 
-#header {
+.header {
   background-color: #333;
   clear: both;
 }
+
+.field-tip {
+    position:relative;
+    font-size: 10pt;
+    cursor:help;
+    color: #aaa;
+}
+    .field-tip .tip-content {
+        position:absolute;
+        top:-10px; /* - top padding */
+        right:9999px;
+        width:400px;
+        font-size: 10pt;
+        line-height: 12pt;
+        margin-right:-220px; /* width + left/right padding */
+        padding:10px;
+        color:#eee;
+        background:#666;
+        opacity:0;
+        -webkit-transition:opacity 250ms ease-out;
+           -moz-transition:opacity 250ms ease-out;
+            -ms-transition:opacity 250ms ease-out;
+             -o-transition:opacity 250ms ease-out;
+                transition:opacity 250ms ease-out;
+    }
+        /* <http://css-tricks.com/snippets/css/css-triangle/> */
+        .field-tip .tip-content:before {
+            content:' '; /* Must have content to display */
+            position:absolute;
+            top:50%;
+            left:-16px; /* 2 x border width */
+            width:0;
+            height:0;
+            margin-top:-8px; /* - border width */
+            border:8px solid transparent;
+            border-right-color:#333;
+        }
+        .field-tip:hover .tip-content {
+            right:-20px;
+            opacity:1;
+        }
+
+        
+/*********************************************************
+  TOP SECTION OF PAGE
+**********************************************************/
 
 #controls {
   padding: 10px;
@@ -136,6 +181,10 @@ body {
 .curl {
   font-size: 8pt;
   height: 20px;
+}
+
+.btn-load-more {
+  margin-left: 25px;
 }
 
 /*********************************************************

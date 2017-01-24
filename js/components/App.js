@@ -10,7 +10,7 @@ import LocalStorageIO from './LocalStorageIO'
 import $ from 'jquery'
 import _ from 'lodash'
 
-var local_storage_version = "1.0.4"
+var local_storage_version = "1.0.5"
 
 const localStorageIO = new LocalStorageIO(local_storage_version)
 
@@ -20,12 +20,13 @@ export default class App extends React.Component {
 		super(props)
 
 		var state = this.getPersistentState()
-		var filters = {}
-		var listings = localStorageIO.readPropertiesFromLocalStorage(state.position, state.zoom, state.bounds, filters) 
+		var searchCriteria = state.searchCriteria
+		var listings = []
 		state.listings = listings
+		state.requires_refresh = false
 		this.state = state
 
-		this.tick = this.tick.bind(this)
+		this.doApiPull = this.doApiPull.bind(this)
 		this.curlRequest = this.curlRequest.bind(this)
 		this.addNewProperties = this.addNewProperties.bind(this)
 		this.updateSearchCriteria = this.updateSearchCriteria.bind(this)
@@ -35,7 +36,6 @@ export default class App extends React.Component {
 	}
 
 	componentDidMount() {
-		this.timer = setInterval(this.tick, 1000)
 	}
 
 	componentWillUnmount() {
@@ -43,14 +43,10 @@ export default class App extends React.Component {
 	}
 
 	getPersistentState() {
+		// TODO: Read the user's location directly
 		var position = {latitude: 33.7, longitude: -118.2}
 		var zoom = 7
-		var bounds = {
-			right: 35.074964853989556,
-			top: -115.927734375,
-			left: 32.33355894864106,
-			bottom: -120.32226562500001
-		}
+		var bounds = undefined
 		var searchCriteria = {
 			price: [0, 5000000],
 			bedrooms: [0, 8],
@@ -60,8 +56,8 @@ export default class App extends React.Component {
 		var state = {
 			network_ok: true,
 			waiting: false,
-			count: 1,
-			limit: 500,
+			count: 0,
+			limit: 100,
 			offset: 0,
 			numCalls: 0,
 			changed: false,
@@ -100,26 +96,30 @@ export default class App extends React.Component {
 			var range = ncriteria[key]
 			uSearchCriteria[key] = range
 		}
-		var nstate = {searchCriteria: uSearchCriteria, offset: 0, count: 1}
+		// Disable visible listings that no longer qualify; check cache for hidden new qualifiers
+		var bounds = this.state.bounds
+		var update = localStorageIO.update_local_cache(uSearchCriteria, bounds)
+		var nlistings = update['visible']
+		var nstate = {listings: nlistings, searchCriteria: uSearchCriteria, offset: 0, count: 1}
 		this.setState(nstate)
-		var matches = localStorageIO.readPropertiesFromLocalStorage(this.state.position, this.state.zoom, this.state.bounds, filters) 
-		// TODO: update from cache
-		// TODO: update ajax
-		this.savePersistentState()
+
+		// Start ajax for API updates
+		this.doApiPull()
 	}
 
 	addNewProperties(resp) {
+		var s2 = new Date().getTime()
 		var listings = resp["results"]
 		var count = resp['count']
 		var offset = this.state.offset + resp['results'].length
 		var filters = {}
-		console.log("calling writeLocalStorage")
-		localStorageIO.writeLocalStorage(resp)
-		var listings = localStorageIO.readPropertiesFromLocalStorage(this.state.position, this.state.zoom, this.state.bounds, filters) 
+		var searchCriteria = this.state.searchCriteria
+		var bounds = this.state.bounds
+		var listings = localStorageIO.update_and_cache(resp, searchCriteria, bounds)
 		var s3 = new Date().getTime()
 		this.setState({count, offset, listings})
 		var s4 = new Date().getTime()
-		console.log(['Time to update:', s4-s3])
+		console.log(['Times to update:', s4-s3, s3-s2])
 	}
 
 	setPositionAndZoom(position, zoom, leaflet_bounds) {
@@ -131,9 +131,14 @@ export default class App extends React.Component {
 		}
 		var prev = {position: this.state.position, zoom: this.state.zoom}
 		var now = {position: position, zoom: zoom}
-		if (this.has_moved(prev, now)) {
-			this.setState({position, zoom, bounds, offset: 0, count: 1})
+		var fn = function() {
+			this.doApiPull()
+		}
+		if (this.state.bounds == undefined || this.has_moved(prev, now)) {
+			this.setState({position, zoom, bounds, offset: 0, count: 1}, fn)
 			this.savePersistentState()
+		} else {
+			this.setState({bounds, offset: 0, count: 1}, fn)
 		}
 	}
 
@@ -192,58 +197,93 @@ export default class App extends React.Component {
 		var lat = position.latitude
 		var lng = position.longitude
 		var bounds = this.state.bounds
-		var corner = {latitude: bounds.left, longitude: bounds.top}
-		var rad = this.haversineDistance(position, corner)
+		var rad = 0
+		if (bounds != undefined) {
+			var corner = {latitude: bounds.left, longitude: bounds.top}
+			rad = this.haversineDistance(position, corner)
+		}
 		curl = curl + "&close_to=(" + rad + "," + lat + "," + lng + ")"
 		return curl
 	}
-	tick() {
-		if (!this.state.busy) {
-			var offset = this.state.offset
-			var limit = this.state.limit
-			var count = this.state.count
-			if (offset < count && offset == 0) {
-				this.setState({busy: true})
-				var curl = this.curlRequest()
-				var url = curl + `&limit=${limit}&offset=${offset}`
-				var me = this
-				var prev = {position: this.state.position, scale: this.state.scale}
-				console.log(url)
-				$.ajax({
-				  url: url,
-				  type: 'GET',
-				  contentType: 'text/json',
-				  dataType: 'json',
-				  success: function (resp) {
-				  	console.log(["Api return result:", resp['results'].length, resp['count']])
-					me.addNewProperties(resp)
-				  	var now = {position: me.state.position, scale: me.state.scale}
-				  	if (me.has_moved(prev, now)) {
-					  	me.setState({busy: false, oneLoadComplete: true, offset: 0, count: 1})
-					} else {
-					  	me.setState({busy: false, oneLoadComplete: true})
-				  	}
-				  },
-				  error: function (xhr, ajaxOptions, thrownError) {
-				  	console.log("fail")
-				  	console.log(me)
-				  	me.setState({network_ok: false, busy: false})
-				  }
-				})
-			} else {
-				if (this.state.busy) {
-					console.log("Reset busy since download is done.")
-					me.setState({busy: false})
+
+	loadMore() {
+		console.log("Load more")
+		this.doApiPull()
+	}
+
+	doApiPull() {
+		/*
+			If an API call is in progress, let it finish - no parallel calls.
+			This flag will tell the function to re-run immediately.
+		*/
+		if (this.state.busy) {
+			console.log("Api is busy, queued request for update")
+			var requires_refresh = true
+			this.setState({requires_refresh})
+		}
+		else {
+			// Nothing to wait for, go ahead and call
+			this.callApi()
+		}
+	}
+
+	callApi() {
+		console.log("callApi")
+		var offset = this.state.offset
+		var limit = this.state.limit
+		var count = this.state.count
+		if (this.state.bounds == undefined) {
+			console.log("Skipping first api call because bounds not loaded yet")
+			return
+		}
+		if ((offset < count || count == 0 && !this.state.oneLoadComplete) || offset == 0 && count > 0) {
+			var curl = this.curlRequest()
+			var url = curl + `&limit=${limit}&offset=${offset}`
+			var me = this
+			var prev = {position: this.state.position, scale: this.state.scale}
+			console.log(url)
+			var t0 = new Date().getTime()
+			var numCalls = this.state.numCalls + 1
+			var busy = true
+			this.setState({busy, numCalls})
+			$.ajax({
+			  url: url,
+			  type: 'GET',
+			  contentType: 'text/json',
+			  dataType: 'json',
+			  success: function (resp) {
+				var t1 = new Date().getTime()
+			  	console.log(["Api return result:", resp['results'].length, resp['count']])
+				me.addNewProperties(resp)
+			  	var now = {position: me.state.position, scale: me.state.scale}
+			  	me.setState({busy: false, oneLoadComplete: true})
+				var t2 = new Date().getTime()
+				console.log(["timing", t2-t1, t1-t0])
+				if (me.state.requires_refresh) {
+					console.log("Handling queued request")
+					var requires_refresh = false
+					me.setState({requires_refresh, busy})
+					me.callApi()
 				}
-			}
+			  },
+			  error: function (xhr, ajaxOptions, thrownError) {
+			  	console.log("fail")
+			  	console.log(me)
+			  	me.setState({network_ok: false, busy: false})
+			  }
+			})
+		}
+		else {
+			console.log("Skipping API call")
+			console.log([offset, count, this.state.oneLoadComplete])
 		}
 	}
 
 	has_moved(prev, now) {
 		var pos1 = prev.position
 		var pos2 = now.position
-		var scale1 = prev.scale1
-		var scale2 = now.scale2
+		var scale1 = prev.zoom
+		var scale2 = now.zoom
 		var delta = 0.000001
 		if (Math.abs(pos1.latitude - pos2.latitude) > delta) {
 			return true
@@ -259,10 +299,15 @@ export default class App extends React.Component {
 
 	render() {
 		var curlRequestFn = this.curlRequest
+		var first_run = true
+		if (this.state.numCalls > 0) {
+			first_run = false
+		}
+		var busy = this.state.busy
 	    return (<div>
 	    		  <Header />
-	    		  <Controls curlRequestFn={curlRequestFn} count={this.state.count} offset={this.state.offset} busy={this.state.busy} changed={this.state.changed} network_ok={this.state.network_ok} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} />
-	    		  <DataView position={this.state.position} zoom={this.state.zoom} setPositionAndZoom={this.setPositionAndZoom} listings={this.state.listings} oneLoadComplete={this.state.oneLoadComplete} />
+	    		  <Controls curlRequestFn={curlRequestFn} first_run={first_run} nlistings={this.state.listings.length} count={this.state.count} offset={this.state.offset} busy={busy} changed={this.state.changed} network_ok={this.state.network_ok} searchCriteria={this.state.searchCriteria} updateSearchCriteria={this.updateSearchCriteria.bind(this)} loadMore={this.loadMore.bind(this)} />
+	    		  <DataView position={this.state.position} zoom={this.state.zoom} setPositionAndZoom={this.setPositionAndZoom.bind(this)} listings={this.state.listings} oneLoadComplete={this.state.oneLoadComplete} />
 	    		  <Footer />
 	           </div>)
 	}
