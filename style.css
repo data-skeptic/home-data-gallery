@@ -87,9 +87,6 @@ body {
   float:left;
 }
 /* Alex K Changes */
-.row {
-  margin-bottom: 20px;
-}
 
 #logo-img {
   margin-left: 5px;
@@ -116,14 +113,11 @@ body {
 }
 
 #mapAndPlotRow {
-  padding-right: 5em;*/
-}
-
-#rowOneLeft {
+  margin-bottom: 20px;
 }
 
 #filters {
-  padding: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 
@@ -142,20 +136,6 @@ body {
 #btnCopy {
     width: 25px;
     height: 15px;
-}
-
-#rowOneLeft {
-}
-
-.col-sm-6 {
-  overflow: hidden;
-  height: 90px;
-}
-
-.col-md-6 {
-  margin-left: 400px;
-  min-width: 300px;
-  width: 50%;
 }
 
 #rowOne {
@@ -227,13 +207,16 @@ body {
 
 .the-map {
   height: 300px;
-  width: 400px;
 }
 
 /*********************************************************
   PLOTS
 **********************************************************/
 
+
+.plots {
+  height: 300px;
+}
 
 .rd3-basic-chart {
   margin-left: 55px;
@@ -242,13 +225,8 @@ body {
 
 .plots-empty {
   background-color: #eee;
-  width: 400px;
   height: 300px;
   padding: 10px;
-}
-
-.Plots {
-  width: 500px
 }
 
 .rd3-chart {
@@ -282,20 +260,20 @@ body {
   SLIDER
 **********************************************************/
 
-.slider {
+#filters .slider {
   margin-bottom: 5px;
   margin-left: 10px;
   width: 200px;
   height: 40px;
 }
-.slider_vals {
+#filters .slider_vals {
   height: 20px;
   line-height: 25px;
 }
-.slider_outer {
+#filters .slider_outer {
   height: 40px;
 }
-.slider_label {
+#filters .slider_label {
   font-size: 8pt;
 }
 
