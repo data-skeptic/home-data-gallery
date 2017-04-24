@@ -32,6 +32,7 @@ export default class OpenHouseMap extends React.Component {
     const position = [this.props.position.latitude, this.props.position.longitude]
     return (
       <Map
+        style={{flex: 1}}
         ref={(map) => { this.themap = map; }}
         class="the-map"
         onMoveend={this.handleMoveend}
@@ -55,7 +56,7 @@ export default class OpenHouseMap extends React.Component {
                     </span>
                   </Popup>
                 </Marker>
-              )              
+              )
             }
           })}
       </Map>
